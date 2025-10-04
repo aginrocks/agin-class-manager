@@ -18,7 +18,7 @@ export default function Home() {
         <Button
           size={"lg"}
           className="font-semibold bg-white hover:bg-gray-200 text"
-          onClick={() => router.push("/dashboard")}>
+          onClick={() => router.push("/login")}>
           Try now
         </Button>
       </div>

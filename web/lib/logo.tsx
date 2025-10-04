@@ -13,13 +13,7 @@ export default function Logo({ size = 3 }: LogoProps) {
 
   return (
     <div>
-      <Image
-        src="/logo.svg"
-        alt="Logo"
-        width={width}
-        height={height}
-        className=""
-      />
+      <Image src="/logo.svg" alt="Logo" width={width} height={height} />
     </div>
   );
 }
