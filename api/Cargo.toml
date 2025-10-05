@@ -1,0 +1,49 @@
+[package]
+name = "api"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axum = { version = "0.8.6", features = ["macros", "ws"] }
+axum-oidc = { git = "https://github.com/pfzetto/axum-oidc.git", branch = "pfzetto" }
+color-eyre = "0.6.5"
+dotenvy = "0.15.7"
+mongodb = "3.3.0"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.145"
+tokio = { version = "1.47.1", features = ["full"] }
+tower =  { version = "0.5.2", features = ["full", "tokio", "log"] }
+tower-sessions = "0.14.0"
+tracing = "0.1.41"
+tracing-error = "0.2.1"
+tracing-subscriber = { version = "0.3.20", features = [
+    "chrono",
+    "json",
+    "env-filter",
+    "local-time",
+    "serde",
+    "serde_json",
+    "time",
+] }
+utoipa =  { version = "5.4.0", features = ["axum_extras", "chrono"] }
+utoipa-axum = "0.2.0"
+utoipa-rapidoc = { version = "6.0.0", features = ["axum"] }
+utoipa-redoc = { version = "6.0.0", features = ["axum"] }
+utoipa-scalar = { version = "0.3.0", features = ["axum"] }
+chrono = { version = "0.4.42", features = ["serde"] }
+http = "1.3.1"
+http-serde-ext = "1.0.2"
+tower-sessions-redis-store = "0.16.0"
+config = "0.15.18"
+strum = { version = "0.27.2", features = ["derive"] }
+toml = "0.9.7"
+openidconnect = { version = "4.0.1", default-features = false, features = [
+    "reqwest",
+    "rustls-tls",
+    "timing-resistant-secret-traits",
+] }
+fred =  { version = "10.1.0", features = ["partial-tracing", "serde-json", "replicas", "enable-rustls-ring"] }
+bson = "3.0.0"
+sha2 = "0.10.9"
+partial_struct = "0.4.5"
+visible = "0.0.1"
