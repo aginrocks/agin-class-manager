@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import Logo from "@/lib/logo";
+import Logo from "@/components/logo";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
