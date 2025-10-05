@@ -41,6 +41,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/organizations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all organizations */
+        get: operations["get_courses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/organizations/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a new organization */
+        post: operations["create_organization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/user": {
         parameters: {
             query?: never;
@@ -62,6 +96,35 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @example {
+         *       "success": true,
+         *       "id": "60c72b2f9b1d8c001c8e4f5a"
+         *     } */
+        CreateSuccess: {
+            id: string;
+            success: boolean;
+        };
+        Membership: {
+            role: components["schemas"]["OrganizationRole"];
+            user_id: string;
+        };
+        /** @description MutableOrganization is used for creating or updating organization throught the API. */
+        MutableOrganization: {
+            avatar_url?: string | null;
+            description: string;
+            name: string;
+            slug: string;
+        };
+        Organization: {
+            _id?: string | null;
+            avatar_url?: string | null;
+            description: string;
+            members: components["schemas"]["Membership"][];
+            name: string;
+            slug: string;
+        };
+        /** @enum {string} */
+        OrganizationRole: "member" | "admin";
         /** @example {
          *       "error": "Unauthorized"
          *     } */
@@ -112,6 +175,68 @@ export interface operations {
         };
         requestBody?: never;
         responses: never;
+    };
+    get_courses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Organization"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+        };
+    };
+    create_organization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MutableOrganization"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateSuccess"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+        };
     };
     get_user: {
         parameters: {
