@@ -1,14 +1,17 @@
+"use client";
 import { useEffect, useState } from "react";
 
+const cache: Record<string, string> = {};
+
 export function useAvatar(
-  email?: string,
+  email: string | undefined,
   defaultAvatar?: string
 ): string | undefined {
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(defaultAvatar);
 
   useEffect(() => {
     (async () => {
-      if (!email || defaultAvatar) return;
+      if (!email || defaultAvatar) return setAvatarUrl(defaultAvatar);
 
       const encoder = new TextEncoder();
       const data = encoder.encode(email.toLowerCase().trim() || "");
@@ -18,11 +21,15 @@ export function useAvatar(
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
 
-      setAvatarUrl(
-        `https://www.gravatar.com/avatar/${gravatarHash}?d=identicon`
-      );
+      const url = `https://www.gravatar.com/avatar/${gravatarHash}?d=404`;
+      cache[email] = url;
+
+      setAvatarUrl(url);
     })();
   }, [email, defaultAvatar]);
+
+  const cached = email && cache[email];
+  if (cached) return cached;
 
   return defaultAvatar || avatarUrl;
 }

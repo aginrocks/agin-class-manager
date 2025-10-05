@@ -38,7 +38,7 @@ export function NavOrganization() {
           <DropdownMenuTrigger asChild>
             <div className="p-2 border rounded-md hover:bg-accent cursor-pointer">
               <OrgOption
-                name={selecrtedOrg?.name || "dupa"}
+                name={selecrtedOrg?.name || "Please log in again"}
                 image={selecrtedOrg?.avatar_url || undefined}
               />
             </div>

@@ -1,10 +1,16 @@
 use color_eyre::eyre::Context;
 use futures::stream::TryStreamExt;
-use mongodb::{Collection, bson::doc};
+use mongodb::{
+    Collection,
+    bson::{doc, oid::ObjectId},
+};
 
 use crate::{
     axum_error::AxumResult,
-    models::organization::{Organization, PartialOrganization},
+    models::{
+        organization::{Organization, PartialOrganization},
+        user::OrganizationRole,
+    },
 };
 
 #[derive(Clone)]
@@ -22,10 +28,10 @@ impl OrganizationStore {
         }
     }
 
-    pub async fn get_all(&self) -> AxumResult<Vec<Organization>> {
+    pub async fn get_all(&self, user_id: ObjectId) -> AxumResult<Vec<Organization>> {
         let cursor = self
             .collection
-            .find(doc! {})
+            .find(doc! {"members.user_id": user_id })
             .await
             .wrap_err("Failed to fetch courses")?;
 
@@ -37,7 +43,7 @@ impl OrganizationStore {
         Ok(organizations)
     }
 
-    pub async fn get_by_id(&self, id: &str) -> AxumResult<Option<Organization>> {
+    pub async fn get_by_id(&self, id: ObjectId) -> AxumResult<Option<Organization>> {
         let organization = self
             .collection
             .find_one(doc! { "_id": id })
@@ -55,5 +61,22 @@ impl OrganizationStore {
             .wrap_err("Failed to fetch organization by slug")?;
 
         Ok(organization)
+    }
+
+    pub async fn add_member(
+        &self,
+        id: ObjectId,
+        user_id: ObjectId,
+        role: OrganizationRole,
+    ) -> AxumResult<()> {
+        self.collection
+            .find_one_and_update(
+                doc! { "_id": id },
+                doc! { "$push": { "members": { "user_id": user_id, "role": role } } },
+            )
+            .await
+            .wrap_err("Failed to add member to organization")?;
+
+        Ok(())
     }
 }

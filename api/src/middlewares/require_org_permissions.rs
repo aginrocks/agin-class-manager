@@ -5,7 +5,7 @@ use axum::{
     response::Response,
 };
 use color_eyre::eyre::eyre;
-use mongodb::bson::doc;
+use mongodb::bson::{doc, oid::ObjectId};
 use serde::{Deserialize, Serialize};
 use tower_sessions::Session;
 use utoipa::ToSchema;
@@ -13,32 +13,37 @@ use utoipa::ToSchema;
 use crate::{
     axum_error::{AxumError, AxumResult},
     middlewares::require_auth::UserData,
-    models::organization::Organization,
+    models::{
+        organization::Organization,
+        user::{Membership, OrganizationRole},
+    },
     state::AppState,
 };
 
 #[derive(Clone, Debug, Deserialize)]
-struct Params {
-    org_id: String,
+pub struct Params {
+    org_id: ObjectId,
 }
 
 #[derive(Clone, Debug, Serialize, ToSchema, Deserialize)]
 pub struct MembershipData(pub crate::models::user::Membership);
 
+#[derive(Clone, Debug, Serialize, ToSchema, Deserialize)]
+pub struct OrganizationData(pub Organization);
+
 pub async fn require_org_membership(
-    State(state): State<AppState>,
+    Extension(state): Extension<AppState>,
     Extension(user_data): Extension<UserData>,
-    session: Session,
-    mut request: Request,
     Path(Params { org_id }): Path<Params>,
+    mut request: Request,
     next: Next,
 ) -> AxumResult<Response> {
     let org_data = state
         .store
         .organization
-        .get_by_id(&org_id)
+        .get_by_id(org_id)
         .await?
-        .ok_or_else(|| AxumError::not_found(eyre!("Class not found")))?;
+        .ok_or_else(|| AxumError::not_found(eyre!("Organization not found")))?;
 
     let is_member = org_data
         .members
@@ -54,6 +59,24 @@ pub async fn require_org_membership(
     request
         .extensions_mut()
         .insert(MembershipData(is_member.unwrap().clone()));
+
+    request
+        .extensions_mut()
+        .insert(OrganizationData(org_data.clone()));
+
+    Ok(next.run(request).await)
+}
+
+pub async fn requre_org_admin(
+    Extension(membership): Extension<MembershipData>,
+    request: Request,
+    next: Next,
+) -> AxumResult<Response> {
+    if membership.0.role != OrganizationRole::Admin {
+        return Err(AxumError::forbidden(eyre!(
+            "You are not an admin of this organization"
+        )));
+    }
 
     Ok(next.run(request).await)
 }
