@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sidebar";
 import Logo from "@/components/logo";
 import { NavOrganization } from "./nav-org";
+import { Label } from "./ui/label";
 
 const data = {
   user: {

@@ -15,7 +15,7 @@ export default function OrgOption({
   return (
     <div
       {...props}
-      className=" rounded-md cursor-pointer flex justify-start items-center">
+      className=" rounded-md cursor-pointer flex justify-start items-center gap-2">
       {image ? (
         <Image
           src={image}
@@ -28,7 +28,12 @@ export default function OrgOption({
       ) : (
         <div className="w-[50px] h-[50px]">{name.charAt(0)}</div>
       )}
-      <div className="ml-4 font-semibold">{name}</div>
+      <div>
+        {size == "large" && (
+          <div className="text-muted-foreground text-sm">Organization:</div>
+        )}
+        <div className="font-semibold">{name}</div>
+      </div>
     </div>
   );
 }
