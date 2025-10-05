@@ -2,12 +2,14 @@ mod axum_error;
 pub mod database;
 mod init;
 mod middlewares;
-mod models;
+pub mod models;
 mod mongo_id;
 mod routes;
 mod settings;
 mod state;
+mod store;
 mod utils;
+pub mod validators;
 
 use std::sync::Arc;
 
@@ -20,6 +22,7 @@ use crate::{
     init::{init_axum, init_database, init_listener, init_redis, init_session_store, init_tracing},
     settings::Settings,
     state::AppState,
+    store::DatabaseStore,
 };
 
 #[derive(OpenApi)]
@@ -40,8 +43,11 @@ async fn main() -> Result<()> {
 
     let fred = init_redis(&settings).await?;
 
+    let store = DatabaseStore::new(&database);
+
     let app_state = AppState {
         database,
+        store,
         settings: settings.clone(),
         fred: fred.clone(),
     };

@@ -13,34 +13,34 @@ use utoipa::ToSchema;
 use crate::{
     axum_error::{AxumError, AxumResult},
     middlewares::require_auth::UserData,
-    models::organization::{Membership, Organization},
+    models::organization::Organization,
     state::AppState,
 };
 
 #[derive(Clone, Debug, Deserialize)]
 struct Params {
-    class_id: String,
+    org_id: String,
 }
 
 #[derive(Clone, Debug, Serialize, ToSchema, Deserialize)]
-pub struct MembershipData(pub crate::models::organization::Membership);
+pub struct MembershipData(pub crate::models::user::Membership);
 
-pub async fn require_class_membership(
+pub async fn require_org_membership(
     State(state): State<AppState>,
     Extension(user_data): Extension<UserData>,
     session: Session,
     mut request: Request,
-    Path(Params { class_id }): Path<Params>,
+    Path(Params { org_id }): Path<Params>,
     next: Next,
 ) -> AxumResult<Response> {
-    let class_data = state
-        .database
-        .collection::<Organization>("classes")
-        .find_one(doc! { "_id": class_id })
+    let org_data = state
+        .store
+        .organization
+        .get_by_id(&org_id)
         .await?
         .ok_or_else(|| AxumError::not_found(eyre!("Class not found")))?;
 
-    let is_member = class_data
+    let is_member = org_data
         .members
         .iter()
         .find(|m| m.user_id == user_data.0.id);

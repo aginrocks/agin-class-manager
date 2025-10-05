@@ -1,5 +1,6 @@
 mod health;
 mod login;
+mod organizations;
 mod user;
 
 use axum::middleware;
@@ -12,6 +13,7 @@ use crate::{middlewares::require_auth::require_auth, state::AppState};
 pub fn routes() -> OpenApiRouter<AppState> {
     let auth = OpenApiRouter::new()
         .nest("/user", user::routes())
+        .nest("/organizations", organizations::routes())
         .layer(middleware::from_fn(require_auth));
 
     let public = OpenApiRouter::new()

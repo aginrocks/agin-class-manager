@@ -1,10 +1,13 @@
 use crate::database_object;
 use crate::mongo_id::object_id_as_string_required;
 
+use crate::models::user::Membership;
+use crate::validators::slug_validator;
 use mongodb::bson::oid::ObjectId;
 use partial_struct::Partial;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use validator::Validate;
 use visible::StructFields;
 
 database_object!(Organization {
@@ -18,25 +21,21 @@ database_object!(Organization {
     description: String,
     slug: String,
     members: Vec<Membership>,
-    avatar_email: Option<String>,
+    avatar_url: Option<String>,
 });
 
-database_object!(Membership {
-    #[schema(value_type = String)]
-    #[serde(with = "object_id_as_string_required")]
-    user_id: ObjectId,
-    role: OrganizationRole,
-});
+/// MutableOrganization is used for creating or updating organization throught the API.
+#[derive(Serialize, Deserialize, ToSchema, Validate)]
+pub struct MutableOrganization {
+    #[validate(length(min = 1, max = 32))]
+    pub name: String,
 
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-#[serde(rename_all = "lowercase")]
-pub enum OrganizationRole {
-    Member = 0,
-    Admin = 1,
-}
+    #[validate(length(max = 2048))]
+    pub description: String,
 
-impl From<OrganizationRole> for mongodb::bson::Bson {
-    fn from(scope: OrganizationRole) -> Self {
-        mongodb::bson::to_bson(&scope).expect("Failed to convert to BSON")
-    }
+    #[validate(custom(function = "slug_validator"), length(min = 1, max = 32))]
+    pub slug: String,
+
+    #[validate(length(max = 500))]
+    pub avatar_url: Option<String>,
 }

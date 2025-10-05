@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 pub mod require_auth;
-pub mod require_class_permissions;
+pub mod require_org_permissions;
 
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct GroupClaims {}
