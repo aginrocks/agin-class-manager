@@ -1,20 +1,72 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
+"use client";
 import { DataTable } from "@/components/data-table";
 import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 import data from "./data.json";
+import { useAtomValue } from "jotai";
+import { SelectedOrgAtom } from "@/lib/atoms/org";
+import { useQuery } from "@tanstack/react-query";
+import { $api } from "@/lib/providers/api";
+import { useMemo } from "react";
+import { UserAtom } from "@/lib/atoms/user";
 
 export default function Page() {
+  const org = useAtomValue(SelectedOrgAtom);
+  const user = useAtomValue(UserAtom);
+
+  const { data: fundrisings } = useQuery(
+    $api.queryOptions(
+      "get",
+      "/api/organizations/{org_id}/fundraising",
+      {
+        params: {
+          // @ts-expect-error
+          path: { org_id: org?._id! },
+        },
+      },
+      {
+        enabled: !!org?._id,
+      }
+    )
+  );
+
+  const { data: organization } = useQuery(
+    $api.queryOptions(
+      "get",
+      "/api/organizations/{org_id}",
+      {
+        params: {
+          path: { org_id: org?._id! },
+        },
+      },
+      {
+        enabled: !!org?._id,
+      }
+    )
+  );
+
+  const totalDue = useMemo(() => {
+    if (!fundrisings) return 0;
+    return fundrisings.reduce(
+      (acc, curr) =>
+        acc +
+        curr.total_amount -
+        (curr.payers.find((u) => u.user_id == user?._id)?.paid_amount || 0),
+      0
+    );
+  }, [fundrisings]);
+
   return (
     <>
       <SiteHeader title="Dashboard" />
       <div className="flex flex-1 flex-col">
         <div className="@container/main flex flex-1 flex-col gap-2">
           <div className="flex flex-col gap-4 px-4 lg:px-6 py-4 md:gap-6 md:py-6">
-            <SectionCards />
+            <SectionCards
+              totalBudget={organization?.budget}
+              totalDue={totalDue}
+            />
             {/* <div className="px-4 lg:px-6">
               <ChartAreaInteractive />
             </div> */}

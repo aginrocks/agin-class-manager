@@ -27,11 +27,13 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { $api } from "@/lib/providers/api";
 import { useAvatar } from "@/lib/hooks/use-avatar";
+import { useAtom, useAtomValue } from "jotai";
+import { UserAtom } from "@/lib/atoms/user";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
 
-  const { data: userData } = useQuery($api.queryOptions("get", "/api/user"));
+  const userData = useAtomValue(UserAtom);
   const avatar = useAvatar(userData?.email);
 
   const avatarFallbackText = userData?.name?.charAt(0)?.toUpperCase() ?? "";

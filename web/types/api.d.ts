@@ -49,7 +49,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get all organizations */
-        get: operations["get_courses"];
+        get: operations["get_organizations"];
         put?: never;
         post?: never;
         delete?: never;
@@ -69,6 +69,58 @@ export interface paths {
         put?: never;
         /** Create a new organization */
         post: operations["create_organization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/organizations/{org_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get organization by id */
+        get: operations["get_organization_by_id"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/organizations/{org_id}/fundraising": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all fundraisings for an organization */
+        get: operations["get_fundraisings"];
+        put?: never;
+        /** Create a new fundraising */
+        post: operations["create_fundraising"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/organizations/{org_id}/members/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add member to organization */
+        post: operations["add_member_to_organization"];
         delete?: never;
         options?: never;
         head?: never;
@@ -104,9 +156,37 @@ export interface components {
             id: string;
             success: boolean;
         };
+        Fundraising: {
+            _id?: string | null;
+            description: string;
+            /** Format: date-time */
+            end_date?: string | null;
+            name: string;
+            organization_id: string;
+            payers: components["schemas"]["Payer"][];
+            /** Format: date-time */
+            start_date?: string | null;
+            /** Format: int64 */
+            total_amount: number;
+        };
+        GenericError: {
+            error: string;
+        };
         Membership: {
             role: components["schemas"]["OrganizationRole"];
             user_id: string;
+        };
+        /** @description MutableFundraising is used for creating or updating fundraising throught the API. */
+        MutableFundraising: {
+            description: string;
+            /** Format: date-time */
+            end_date?: string | null;
+            name: string;
+            payers: components["schemas"]["Payer"][];
+            /** Format: date-time */
+            start_date?: string | null;
+            /** Format: int64 */
+            total_amount: number;
         };
         /** @description MutableOrganization is used for creating or updating organization throught the API. */
         MutableOrganization: {
@@ -115,9 +195,17 @@ export interface components {
             name: string;
             slug: string;
         };
+        /** @example {
+         *       "error": "Not Found"
+         *     } */
+        NotFoundError: {
+            error: string;
+        };
         Organization: {
             _id?: string | null;
             avatar_url?: string | null;
+            /** Format: int64 */
+            budget: number;
             description: string;
             members: components["schemas"]["Membership"][];
             name: string;
@@ -125,6 +213,15 @@ export interface components {
         };
         /** @enum {string} */
         OrganizationRole: "member" | "admin";
+        PatchMemberPayload: {
+            role: components["schemas"]["OrganizationRole"];
+            user_id: string;
+        };
+        Payer: {
+            /** Format: int64 */
+            paid_amount: number;
+            user_id: string;
+        };
         /** @example {
          *       "error": "Unauthorized"
          *     } */
@@ -176,7 +273,7 @@ export interface operations {
         requestBody?: never;
         responses: never;
     };
-    get_courses: {
+    get_organizations: {
         parameters: {
             query?: never;
             header?: never;
@@ -234,6 +331,154 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+        };
+    };
+    get_organization_by_id: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization id */
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Organization"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+        };
+    };
+    get_fundraisings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Fundraising"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+        };
+    };
+    create_fundraising: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MutableFundraising"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateSuccess"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+        };
+    };
+    add_member_to_organization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization id */
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchMemberPayload"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericError"];
+                };
+            };
+            /** @description Organization not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotFoundError"];
                 };
             };
         };
