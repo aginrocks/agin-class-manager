@@ -32,6 +32,7 @@ import {
   IconLayoutColumns,
   IconLoader,
   IconPlus,
+  IconProgress,
   IconTrendingUp,
 } from "@tabler/icons-react";
 import {
@@ -100,6 +101,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { paths } from "@/types/api";
 
 export const schema = z.object({
   id: z.number(),
@@ -130,12 +132,14 @@ function DragHandle({ id }: { id: number }) {
   );
 }
 
-const columns: ColumnDef<z.infer<typeof schema>>[] = [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-  },
+const columns: ColumnDef<
+  paths["/api/organizations/{org_id}/fundraising"]["get"]["responses"]["200"]["content"]["application/json"][0]
+>[] = [
+  // {
+  //   id: "drag",
+  //   header: () => null,
+  //   cell: ({ row }) => <DragHandle id={row.original.id} />,
+  // },
   {
     id: "select",
     header: ({ table }) => (
@@ -163,147 +167,136 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "header",
-    header: "Header",
+    accessorKey: "name",
+    header: () => <div>Title</div>,
     cell: ({ row }) => {
-      return <TableCellViewer item={row.original} />;
+      return <div className="font-semibold"> {row.original.name}</div>;
     },
     enableHiding: false,
   },
-  {
-    accessorKey: "type",
-    header: "Section Type",
-    cell: ({ row }) => (
-      <div className="w-32">
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
-          {row.original.type}
-        </Badge>
-      </div>
-    ),
-  },
+  // {
+  //   accessorKey: "type",
+  //   header: "Section Type",
+  //   cell: ({ row }) => (
+  //     <div className="w-32">
+  //       <Badge variant="outline" className="text-muted-foreground px-1.5">
+  //         {row.original.type}
+  //       </Badge>
+  //     </div>
+  //   ),
+  // },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.status === "Done" ? (
-          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-        ) : (
+        {/* {row.original.status === "Done" ? ( */}
+        <IconProgress className="fill-green-500 dark:fill-green-400" />
+        {/* ) : (
           <IconLoader />
-        )}
-        {row.original.status}
+        )} */}
+        Ongoing
       </Badge>
     ),
   },
+  // {
+  //   accessorKey: "target",
+  //   header: () => <div className="w-full text-right">Target</div>,
+  //   cell: ({ row }) => (
+  //     <form
+  //       onSubmit={(e) => {
+  //         e.preventDefault();
+  //         toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
+  //           loading: `Saving ${row.original.header}`,
+  //           success: "Done",
+  //           error: "Error",
+  //         });
+  //       }}>
+  //       <Label htmlFor={`${row.original.id}-target`} className="sr-only">
+  //         Target
+  //       </Label>
+  //       <Input
+  //         className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
+  //         defaultValue={row.original.target}
+  //         id={`${row.original.id}-target`}
+  //       />
+  //     </form>
+  //   ),
+  // },
   {
-    accessorKey: "target",
-    header: () => <div className="w-full text-right">Target</div>,
+    accessorKey: "total_amount",
+    header: () => <div className="">Total amount</div>,
     cell: ({ row }) => (
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Saving ${row.original.header}`,
-            success: "Done",
-            error: "Error",
-          });
-        }}>
-        <Label htmlFor={`${row.original.id}-target`} className="sr-only">
-          Target
-        </Label>
-        <Input
-          className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
-          defaultValue={row.original.target}
-          id={`${row.original.id}-target`}
-        />
-      </form>
+      <div>${(row.original.total_amount / 100).toFixed(2)}</div>
     ),
   },
-  {
-    accessorKey: "limit",
-    header: () => <div className="w-full text-right">Limit</div>,
-    cell: ({ row }) => (
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Saving ${row.original.header}`,
-            success: "Done",
-            error: "Error",
-          });
-        }}>
-        <Label htmlFor={`${row.original.id}-limit`} className="sr-only">
-          Limit
-        </Label>
-        <Input
-          className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
-          defaultValue={row.original.limit}
-          id={`${row.original.id}-limit`}
-        />
-      </form>
-    ),
-  },
-  {
-    accessorKey: "reviewer",
-    header: "Reviewer",
-    cell: ({ row }) => {
-      const isAssigned = row.original.reviewer !== "Assign reviewer";
+  // {
+  //   accessorKey: "reviewer",
+  //   header: "Reviewer",
+  //   cell: ({ row }) => {
+  //     const isAssigned = row.original. !== "Assign reviewer";
 
-      if (isAssigned) {
-        return row.original.reviewer;
-      }
+  //     if (isAssigned) {
+  //       return row.original.reviewer;
+  //     }
 
-      return (
-        <>
-          <Label htmlFor={`${row.original.id}-reviewer`} className="sr-only">
-            Reviewer
-          </Label>
-          <Select>
-            <SelectTrigger
-              className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-              size="sm"
-              id={`${row.original.id}-reviewer`}>
-              <SelectValue placeholder="Assign reviewer" />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-              <SelectItem value="Jamik Tashpulatov">
-                Jamik Tashpulatov
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </>
-      );
-    },
-  },
-  {
-    id: "actions",
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-            size="icon">
-            <IconDotsVertical />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuItem>Favorite</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
+  //     return (
+  //       <>
+  //         <Label htmlFor={`${row.original._id}-reviewer`} className="sr-only">
+  //           Reviewer
+  //         </Label>
+  //         <Select>
+  //           <SelectTrigger
+  //             className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
+  //             size="sm"
+  //             id={`${row.original._id}-reviewer`}>
+  //             <SelectValue placeholder="Assign reviewer" />
+  //           </SelectTrigger>
+  //           <SelectContent align="end">
+  //             <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
+  //             <SelectItem value="Jamik Tashpulatov">
+  //               Jamik Tashpulatov
+  //             </SelectItem>
+  //           </SelectContent>
+  //         </Select>
+  //       </>
+  //     );
+  //   },
+  // },
+  // {
+  //   id: "actions",
+  //   cell: () => (
+  //     <DropdownMenu>
+  //       <DropdownMenuTrigger asChild>
+  //         <Button
+  //           variant="ghost"
+  //           className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+  //           size="icon">
+  //           <IconDotsVertical />
+  //           <span className="sr-only">Open menu</span>
+  //         </Button>
+  //       </DropdownMenuTrigger>
+  //       <DropdownMenuContent align="end" className="w-32">
+  //         <DropdownMenuItem>Edit</DropdownMenuItem>
+  //         <DropdownMenuItem>Make a copy</DropdownMenuItem>
+  //         <DropdownMenuItem>Favorite</DropdownMenuItem>
+  //         <DropdownMenuSeparator />
+  //         <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+  //       </DropdownMenuContent>
+  //     </DropdownMenu>
+  //   ),
+  // },
 ];
 
-function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
+function DraggableRow({
+  row,
+}: {
+  row: Row<
+    paths["/api/organizations/{org_id}/fundraising"]["get"]["responses"]["200"]["content"]["application/json"][0]
+  >;
+}) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
-    id: row.original.id,
+    id: row.original._id,
   });
 
   return (
@@ -328,7 +321,7 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
 export function DataTable({
   data: initialData,
 }: {
-  data: z.infer<typeof schema>[];
+  data: paths["/api/organizations/{org_id}/fundraising"]["get"]["responses"]["200"]["content"]["application/json"];
 }) {
   const [data, setData] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});
@@ -349,8 +342,12 @@ export function DataTable({
     useSensor(KeyboardSensor, {})
   );
 
+  React.useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
+
   const dataIds = React.useMemo<UniqueIdentifier[]>(
-    () => data?.map(({ id }) => id) || [],
+    () => data?.map(({ _id }) => _id) || [],
     [data]
   );
 
@@ -364,7 +361,7 @@ export function DataTable({
       columnFilters,
       pagination,
     },
-    getRowId: (row) => row.id.toString(),
+    getRowId: (row) => row._id.toString(),
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -412,7 +409,7 @@ export function DataTable({
             <SelectItem value="focus-documents">Focus Documents</SelectItem>
           </SelectContent>
         </Select> */}
-        <div className="text-2xl font-semibold ">Expenses history</div>
+        <div className="text-2xl font-semibold ">Fundraisings</div>
         {/* <TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
           <TabsTrigger value="outline">Outline</TabsTrigger>
           <TabsTrigger value="past-performance">

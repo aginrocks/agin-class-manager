@@ -48,12 +48,14 @@ export default function Page() {
 
   const totalDue = useMemo(() => {
     if (!fundrisings) return 0;
-    return fundrisings.reduce(
-      (acc, curr) =>
-        acc +
-        curr.total_amount -
-        (curr.payers.find((u) => u.user_id == user?._id)?.paid_amount || 0),
-      0
+    return (
+      fundrisings.reduce(
+        (acc, curr) =>
+          acc +
+          curr.total_amount -
+          (curr.payers.find((u) => u.user_id == user?._id)?.paid_amount || 0),
+        0
+      ) / organization?.members.length!
     );
   }, [fundrisings]);
 
@@ -71,7 +73,7 @@ export default function Page() {
               <ChartAreaInteractive />
             </div> */}
 
-            <DataTable data={data} />
+            <DataTable data={fundrisings || []} />
           </div>
         </div>
       </div>

@@ -157,7 +157,7 @@ export interface components {
             success: boolean;
         };
         Fundraising: {
-            _id?: string | null;
+            _id: string;
             description: string;
             /** Format: date-time */
             end_date?: string | null;
