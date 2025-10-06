@@ -29,9 +29,11 @@ import { $api } from "@/lib/providers/api";
 import { useAvatar } from "@/lib/hooks/use-avatar";
 import { useAtom, useAtomValue } from "jotai";
 import { UserAtom } from "@/lib/atoms/user";
+import { useRouter } from "next/navigation";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
+  const router = useRouter();
 
   const userData = useAtomValue(UserAtom);
   const avatar = useAvatar(userData?.email);
@@ -83,7 +85,7 @@ export function NavUser() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
+            {/* <DropdownMenuGroup>
               <DropdownMenuItem>
                 <IconUserCircle />
                 Account
@@ -97,8 +99,8 @@ export function NavUser() {
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuSeparator /> */}
+            <DropdownMenuItem onClick={() => router.push("/api/logout")}>
               <IconLogout />
               Log out
             </DropdownMenuItem>
