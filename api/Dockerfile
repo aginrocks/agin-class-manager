@@ -43,7 +43,7 @@ RUN mkdir -p /app/target/release
 RUN cp target/$(xx-cargo --print-target-triple)/release/${PROJECT_NAME} /app/output
 
 FROM scratch AS runtime
-COPY --from=builder /app/output /app
+COPY --from=builder /app/output /app/api
 
-EXPOSE 3002
-ENTRYPOINT ["/app"]
+EXPOSE 4000
+ENTRYPOINT ["/app/api"]

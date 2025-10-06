@@ -1,0 +1,18 @@
+[general]
+listen_address = [
+    "0.0.0.0:4000",
+    "[::]:4000",
+]
+public_url = "http://localhost:3010/"
+
+[db]
+connection_string = "mongodb://mongodb:27017"
+database_name = "agin-class-manager"
+
+[oidc]
+issuer = "https://example.com"
+client_id = "client_id"
+client_secret = "client_secret"
+
+[redis]
+connection_string = "redis://valkey:6379"

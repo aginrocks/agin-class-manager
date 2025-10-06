@@ -146,7 +146,7 @@ impl Settings {
                 client_secret: Some(ClientSecret::new("client_secret".to_string())),
             },
             redis: Redis {
-                connection_string: "redis://localhost:6379".to_string(),
+                connection_string: "redis://valkey:6379".to_string(),
             },
         }
     }
