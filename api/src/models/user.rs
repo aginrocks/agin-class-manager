@@ -32,6 +32,6 @@ pub enum OrganizationRole {
 
 impl From<OrganizationRole> for mongodb::bson::Bson {
     fn from(scope: OrganizationRole) -> Self {
-        mongodb::bson::to_bson(&scope).expect("Failed to convert to BSON")
+        mongodb::bson::serialize_to_bson(&scope).expect("Failed to convert to BSON")
     }
 }

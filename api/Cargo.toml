@@ -8,7 +8,7 @@ axum = { version = "0.8.6", features = ["macros", "ws"] }
 axum-oidc = { git = "https://github.com/pfzetto/axum-oidc.git", branch = "pfzetto" }
 color-eyre = "0.6.5"
 dotenvy = "0.15.7"
-mongodb = "3.3.0"
+mongodb = { version = "3.3.0", features = ["bson-3"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
 tokio = { version = "1.47.1", features = ["full"] }
@@ -43,7 +43,7 @@ openidconnect = { version = "4.0.1", default-features = false, features = [
     "timing-resistant-secret-traits",
 ] }
 fred =  { version = "10.1.0", features = ["partial-tracing", "serde-json", "replicas", "enable-rustls-ring"] }
-bson = "3.0.0"
+bson = { version = "3.0.0", features = ["chrono-0_4"] }
 sha2 = "0.10.9"
 partial_struct = "0.4.5"
 visible = "0.0.1"

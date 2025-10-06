@@ -1,3 +1,4 @@
+mod fundraising;
 mod members;
 
 use axum::{Extension, Json, extract::Path, middleware};
@@ -18,6 +19,7 @@ pub fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_organization_by_id))
         .nest("/members", members::routes())
+        .nest("/fundraising", fundraising::routes())
         .layer(middleware::from_fn(require_org_membership))
 }
 
