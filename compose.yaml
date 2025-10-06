@@ -1,16 +1,62 @@
 services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      args:
+        - PROJECT_NAME=api
+    depends_on:
+      - mongodb
+      - valkey
+    volumes:
+      - ./config.toml:/app/config.toml:ro
+    restart: unless-stopped
+    networks:
+      - default
+      - proxy
+    labels:
+      traefik.enable: true
+      traefik.port: 4000
+      traefik.http.routers.musicguessr-api.rule: "Host(`class.agin.rocks`) && (PathPrefix(`/api`) || PathPrefix(`/socket.io`) || PathPrefix(`/apidoc`))"
+      traefik.http.services.musicguessr-api.loadbalancer.server.port: 4000
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    depends_on:
+      - api
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    networks:
+      - default
+      - proxy
+    labels:
+      traefik.enable: true
+      traefik.port: 3000
+      traefik.http.services.musicguessr-web.loadbalancer.server.port: "3000"
+      traefik.http.routers.musicguessr-web.rule: "Host(`class.agin.rocks`)"
   mongodb:
     image: mongodb/mongodb-community-server:6.0.19-ubi8
-    ports:
-      - 27017:27017
+    # ports:
+    #   - 27017:27017
     volumes:
       - ./data/mongodb:/data/db
     restart: always
     user: 1000:1000
+    networks:
+      - default
   valkey:
     image: valkey/valkey:latest
     restart: unless-stopped
-    ports:
-      - 6379:6379
+    # ports:
+    #   - 6379:6379
     volumes:
       - ./data/valkey:/data
+    networks:
+      - default
+networks:
+  proxy:
+    name: proxy-network
+    external: true
+  default:

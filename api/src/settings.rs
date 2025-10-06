@@ -137,7 +137,7 @@ impl Settings {
                     .expect("hardcoded uri should parse"),
             },
             db: Db {
-                connection_string: "mongodb://localhost:27017".to_string(),
+                connection_string: "mongodb://mongodb:27017".to_string(),
                 database_name: "agin-class-manager".to_string(),
             },
             oidc: Oidc {

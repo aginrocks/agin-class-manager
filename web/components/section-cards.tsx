@@ -1,14 +1,7 @@
-import {
-  IconCalendar,
-  IconTimeDuration0,
-  IconTrendingDown,
-  IconTrendingUp,
-} from "@tabler/icons-react";
+import { IconCalendar, IconTrendingDown } from "@tabler/icons-react";
 
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
-  CardAction,
   CardDescription,
   CardFooter,
   CardHeader,

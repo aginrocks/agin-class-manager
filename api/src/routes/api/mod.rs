@@ -15,12 +15,12 @@ pub fn routes() -> OpenApiRouter<AppState> {
     let auth = OpenApiRouter::new()
         .nest("/user", user::routes())
         .nest("/organizations", organizations::routes())
-        .nest("/logout", logout::routes())
         .layer(middleware::from_fn(require_auth));
 
     let public = OpenApiRouter::new()
         .nest("/health", health::routes())
-        .nest("/login", login::routes());
+        .nest("/login", login::routes())
+        .nest("/logout", logout::routes());
 
     auth.merge(public)
 }

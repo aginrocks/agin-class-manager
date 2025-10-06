@@ -4,12 +4,7 @@ import * as React from "react";
 import {
   IconBuildingBroadcastTower,
   IconDashboard,
-  IconDatabase,
-  IconFileWord,
-  IconHelp,
   IconListDetails,
-  IconReport,
-  IconSearch,
   IconSettings,
 } from "@tabler/icons-react";
 
@@ -27,7 +22,6 @@ import {
 } from "@/components/ui/sidebar";
 import Logo from "@/components/logo";
 import { NavOrganization } from "./nav-org";
-import { Label } from "./ui/label";
 
 const data = {
   user: {
@@ -58,16 +52,16 @@ const data = {
       url: "#",
       icon: IconSettings,
     },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
+    // {
+    //   title: "Get Help",
+    //   url: "#",
+    //   icon: IconHelp,
+    // },
+    // {
+    //   title: "Search",
+    //   url: "#",
+    //   icon: IconSearch,
+    // },
   ],
 };
 

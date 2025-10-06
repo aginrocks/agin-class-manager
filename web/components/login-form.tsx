@@ -1,17 +1,7 @@
-import { GalleryVerticalEnd } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Logo from "@/components/logo";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "./ui/field";
+import { Field, FieldGroup } from "./ui/field";
 import Image from "next/image";
 import Link from "next/link";
 

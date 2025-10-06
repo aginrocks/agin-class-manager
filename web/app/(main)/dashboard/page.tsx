@@ -3,7 +3,6 @@ import { DataTable } from "@/components/data-table";
 import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
 
-import data from "./data.json";
 import { useAtomValue } from "jotai";
 import { SelectedOrgAtom } from "@/lib/atoms/org";
 import { useQuery } from "@tanstack/react-query";
@@ -21,8 +20,8 @@ export default function Page() {
       "/api/organizations/{org_id}/fundraising",
       {
         params: {
-          // @ts-expect-error
-          path: { org_id: org?._id! },
+          //@ts-expect-error when org._id is null then it's not even enabled and it shouldn't be a problem
+          path: { org_id: org?._id },
         },
       },
       {
@@ -37,7 +36,8 @@ export default function Page() {
       "/api/organizations/{org_id}",
       {
         params: {
-          path: { org_id: org?._id! },
+          //@ts-expect-error when org._id is null then it's not even enabled and it shouldn't be a problem
+          path: { org_id: org?._id },
         },
       },
       {
@@ -55,9 +55,9 @@ export default function Page() {
           curr.total_amount -
           (curr.payers.find((u) => u.user_id == user?._id)?.paid_amount || 0),
         0
-      ) / organization?.members.length!
+      ) / (organization?.members.length || 1)
     );
-  }, [fundrisings]);
+  }, [fundrisings, organization?.members]);
 
   return (
     <>

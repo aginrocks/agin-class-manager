@@ -15,7 +15,7 @@ database_object!(Organization {
         rename = "_id",
         with = "object_id_as_string_required"
     )]
-    #[schema(value_type = Option<String>)]
+    #[schema(value_type = String)]
     id: ObjectId,
     name: String,
     description: String,

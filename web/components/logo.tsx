@@ -1,4 +1,3 @@
-import { IconBook } from "@tabler/icons-react";
 import Image from "next/image";
 import { useMemo } from "react";
 

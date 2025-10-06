@@ -41,6 +41,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Log out
+         * @description Clears the user session, removes the OIDC 'id' cookie, and redirects to the OIDC end-session endpoint.
+         */
+        get: operations["log_out"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/organizations": {
         parameters: {
             query?: never;
@@ -202,7 +222,7 @@ export interface components {
             error: string;
         };
         Organization: {
-            _id?: string | null;
+            _id: string;
             avatar_url?: string | null;
             /** Format: int64 */
             budget: number;
@@ -264,6 +284,16 @@ export interface operations {
         };
     };
     log_in: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
+    log_out: {
         parameters: {
             query?: never;
             header?: never;

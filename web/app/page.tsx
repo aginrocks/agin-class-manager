@@ -12,8 +12,8 @@ export default function Home() {
         <Logo size={12} />
         <div className="max-w-xl text-center text-lg font-medium">
           Have you ever had a problem with managing finances of your school
-          class? Not anymore! This project helps with organizing your classe's
-          buget and expenses.
+          class? Not anymore! This project helps with organizing your
+          classe&apos;s buget and expenses.
         </div>
         <Button
           size={"lg"}
