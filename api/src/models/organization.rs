@@ -22,6 +22,7 @@ database_object!(Organization {
     slug: String,
     members: Vec<Membership>,
     avatar_url: Option<String>,
+    budget: u64,
 });
 
 /// MutableOrganization is used for creating or updating organization throught the API.

@@ -9,15 +9,18 @@ use crate::{
         require_auth::UnauthorizedError,
         require_org_permissions::{OrganizationData, requre_org_admin},
     },
-    models::fundraising::{MutableFundraising, PartialFundraising},
-    routes::api::CreateSuccess,
+    models::fundraising::{Fundraising, MutableFundraising, PartialFundraising},
+    routes::{self, api::CreateSuccess},
     state::AppState,
 };
 
 pub fn routes() -> OpenApiRouter<AppState> {
-    OpenApiRouter::new()
+    let admin = OpenApiRouter::new()
         .routes(routes!(create_fundraising))
-        .layer(middleware::from_fn(requre_org_admin))
+        .layer(middleware::from_fn(requre_org_admin));
+    let user = OpenApiRouter::new().routes(routes!(get_fundraisings));
+
+    admin.merge(user)
 }
 
 /// Create a new fundraising
@@ -65,4 +68,27 @@ async fn create_fundraising(
         success: true,
         id: fundraising.id.to_string(),
     }))
+}
+
+/// Get all fundraisings for an organization
+#[utoipa::path(
+    method(get),
+    path = "/",
+    responses(
+        (status = OK, description = "Success", body = Vec<Fundraising>, content_type = "application/json"),
+        (status = UNAUTHORIZED, description = "Unauthorized", body = UnauthorizedError, content_type = "application/json")
+    ),
+    tag = "Fundraising"
+)]
+async fn get_fundraisings(
+    Extension(state): Extension<AppState>,
+    Extension(org_data): Extension<OrganizationData>,
+) -> AxumResult<Json<Vec<Fundraising>>> {
+    let fundraisings = state
+        .store
+        .fundraising
+        .get_by_organization(&org_data.0.id)
+        .await?;
+
+    Ok(Json(fundraisings))
 }

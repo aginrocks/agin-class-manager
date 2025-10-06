@@ -58,6 +58,7 @@ async fn create_organization(
             user_id: user_id.0,
             role: OrganizationRole::Admin,
         }],
+        budget: 0,
     };
 
     let inserted_org = state

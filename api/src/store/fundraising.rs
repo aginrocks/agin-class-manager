@@ -1,4 +1,6 @@
+use bson::doc;
 use color_eyre::eyre::Context;
+use futures::TryStreamExt;
 use mongodb::{Collection, bson::oid::ObjectId};
 
 use crate::{
@@ -41,5 +43,23 @@ impl FundraisingStore {
                 .as_object_id()
                 .expect("Failed to get inserted id"),
         })
+    }
+
+    pub async fn get_by_organization(
+        &self,
+        organization_id: &ObjectId,
+    ) -> AxumResult<Vec<Fundraising>> {
+        let mut cursor = self
+            .collection
+            .find(doc! { "organization_id": organization_id })
+            .await
+            .wrap_err("Failed to fetch fundraisings")?;
+
+        let fundraisings = cursor
+            .try_collect()
+            .await
+            .wrap_err("Failed to collect courses")?;
+
+        Ok(fundraisings)
     }
 }
