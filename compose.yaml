@@ -4,7 +4,8 @@ services:
       context: ./api
       dockerfile: Dockerfile
       args:
-        - PROJECT_NAME=api
+        PROJECT_NAME: api
+        BUILDPLATFORM: linux/amd64
     depends_on:
       - mongodb
       - valkey
