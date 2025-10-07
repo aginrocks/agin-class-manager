@@ -20,6 +20,17 @@ export function LoginForm({
               <Logo size={10} />
             </a>
           </div>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <div className="text-2xl font-bold">Demo account:</div>
+            <div className="flex gap-2">
+              <div className="text-xl font-semibold">Login:</div>
+              <div className="text-xl">demo</div>
+            </div>
+            <div className="flex gap-2">
+              <div className="text-xl font-semibold">Password:</div>
+              <div className="text-xl">demo</div>
+            </div>
+          </div>
           <FieldGroup>
             {/* <div className="flex flex-col items-center gap-1 text-center">
               <h1 className="text-2xl font-bold">Login to your account</h1>
