@@ -1,0 +1,18 @@
+services:
+  mongodb:
+    image: mongodb/mongodb-community-server:7.0-ubi8
+    volumes:
+      - type: bind
+        source: ./data/mongodb
+        target: /data/db
+    ports:
+      - 27017:27017
+    restart: unless-stopped
+    user: 1000:1000
+  valkey:
+    image: valkey/valkey:latest
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    volumes:
+      - ./data/valkey:/data

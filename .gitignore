@@ -4,3 +4,5 @@ data/valkey/*
 
 !data/mongodb/dummyfile
 !data/valkey/dummyfile
+
+target

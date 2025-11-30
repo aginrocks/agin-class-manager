@@ -59,7 +59,7 @@ _If you want to use something different than traefik, you need to adjust compose
 You need to set oidc client and your public url for oidc to work properly.
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ## Development:
@@ -84,6 +84,7 @@ pnpm dev
 **api**
 
 ```bash
+docker compose -f compose-dev.yaml up -d # This is for database and redis
 cd api/
 cargo run
 ```
