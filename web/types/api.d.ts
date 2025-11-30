@@ -192,6 +192,13 @@ export interface components {
         GenericError: {
             error: string;
         };
+        GetUserRes: {
+            _id: string;
+            email: string;
+            name: string;
+            organizations: components["schemas"]["StrippedOrg"][];
+            subject: string;
+        };
         Membership: {
             role: components["schemas"]["OrganizationRole"];
             user_id: string;
@@ -242,17 +249,16 @@ export interface components {
             paid_amount: number;
             user_id: string;
         };
+        StrippedOrg: {
+            _id: string;
+            avatar_url?: string | null;
+            name: string;
+        };
         /** @example {
          *       "error": "Unauthorized"
          *     } */
         UnauthorizedError: {
             error: string;
-        };
-        User: {
-            _id: string;
-            email: string;
-            name: string;
-            subject: string;
         };
     };
     responses: never;
@@ -528,7 +534,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["User"];
+                    "application/json": components["schemas"]["GetUserRes"];
                 };
             };
             /** @description Unauthorized */

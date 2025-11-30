@@ -38,7 +38,7 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            {children}
+            <div className="w-screen h-screen">{children}</div>
           </ThemeProvider>
         </body>
       </html>
