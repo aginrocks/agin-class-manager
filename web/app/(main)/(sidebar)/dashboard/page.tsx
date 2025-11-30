@@ -26,8 +26,8 @@ export default function Page() {
       },
       {
         enabled: !!org?._id,
-      }
-    )
+      },
+    ),
   );
 
   const { data: organization } = useQuery(
@@ -42,8 +42,8 @@ export default function Page() {
       },
       {
         enabled: !!org?._id,
-      }
-    )
+      },
+    ),
   );
 
   const totalDue = useMemo(() => {
@@ -54,7 +54,7 @@ export default function Page() {
           acc +
           curr.total_amount -
           (curr.payers.find((u) => u.user_id == user?._id)?.paid_amount || 0),
-        0
+        0,
       ) / (organization?.members.length || 1)
     );
   }, [fundrisings, organization?.members]);
@@ -69,9 +69,9 @@ export default function Page() {
               totalBudget={organization?.budget}
               totalDue={totalDue}
             />
-            {/* <div className="px-4 lg:px-6">
+            {/*<div className="px-4 lg:px-6">
               <ChartAreaInteractive />
-            </div> */}
+            </div>*/}
 
             <DataTable data={fundrisings || []} />
           </div>
