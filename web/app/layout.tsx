@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { TAGLINE, TITLE } from "@/lib/config";
 import Query from "@/lib/providers/Query";
 import { ReactNode } from "react";
+import { DialogManager } from "@/lib/dialogs";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +39,9 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <div className="w-screen h-screen">{children}</div>
+            <DialogManager>
+              <div className="w-screen h-screen">{children}</div>
+            </DialogManager>
           </ThemeProvider>
         </body>
       </html>

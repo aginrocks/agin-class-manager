@@ -35,7 +35,7 @@ pub struct MutableOrganization {
     pub description: String,
 
     #[validate(custom(function = "slug_validator"), length(min = 1, max = 32))]
-    pub slug: String,
+    pub slug: Option<String>,
 
     #[validate(length(max = 500))]
     pub avatar_url: Option<String>,

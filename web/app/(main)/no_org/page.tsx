@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useDialogs } from "@/lib/dialogs";
 import { useAvatar } from "@/lib/hooks/use-avatar";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { $api } from "@/lib/providers/api";
@@ -19,6 +20,7 @@ import { useRouter } from "next/navigation";
 export default function Page() {
   const router = useRouter();
   const isMobile = useIsMobile();
+  const dialogs = useDialogs();
 
   const { data: userData } = useQuery($api.queryOptions("get", "/api/user"));
 
@@ -30,9 +32,7 @@ export default function Page() {
       <div className="absolute bottom-4 left-4 flex border-border border-2 rounded-md cursor-pointer">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div
-              // size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex p-4 gap-2 items-center ">
+            <div className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex p-2 gap-2 items-center ">
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={avatar} alt={userData?.name} />
                 <AvatarFallback className="rounded-lg">
@@ -80,7 +80,9 @@ export default function Page() {
       <div className="text-xl font-bold">
         Looks like you don't have any organization yet
       </div>
-      <Button>Create an organization</Button>
+      <Button onClick={() => dialogs.show("CreateOrg")}>
+        Create an organization
+      </Button>
     </div>
   );
 }

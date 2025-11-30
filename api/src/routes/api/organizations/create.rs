@@ -1,7 +1,7 @@
 use axum::{Extension, Json, extract::State};
 use axum_valid::Valid;
 use color_eyre::eyre::{self, Context, ContextCompat};
-use fred::rustls::pki_types::alg_id;
+use regex::Regex;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -17,6 +17,13 @@ use crate::{
 
 pub fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new().routes(routes!(create_organization))
+}
+
+fn sanitize(s: &str) -> String {
+    let re = Regex::new(r"[^a-zA-Z0-9]+").unwrap();
+    let lower = s.to_lowercase();
+    let replaced = re.replace_all(&lower, "_");
+    replaced.trim_matches('_').to_string()
 }
 
 /// Create a new organization
@@ -35,13 +42,12 @@ async fn create_organization(
     State(state): State<AppState>,
     Valid(body): Valid<Json<MutableOrganization>>,
 ) -> AxumResult<Json<CreateSuccess>> {
-    // let already_exists = state
-    //     .database
-    //     .collection::<Organization>("organizations")
-    //     .find_one(doc! { "slug": &body.slug })
-    //     .await?;
+    let slug = match &body.slug {
+        Some(slug) => slug.to_owned(),
+        None => sanitize(&body.name),
+    };
 
-    let already_exists = state.store.organization.get_by_slug(&body.slug).await?;
+    let already_exists = state.store.organization.get_by_slug(&slug).await?;
 
     if already_exists.is_some() {
         return Err(AxumError::forbidden(eyre::eyre!(
@@ -52,7 +58,7 @@ async fn create_organization(
     let organization = PartialOrganization {
         name: body.name.clone(),
         description: body.description.clone(),
-        slug: body.slug.clone(),
+        slug: slug,
         avatar_url: body.avatar_url.clone(),
         members: vec![Membership {
             user_id: user_id.0,

@@ -71,22 +71,6 @@ export interface paths {
         /** Get all organizations */
         get: operations["get_organizations"];
         put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/organizations/create": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         /** Create a new organization */
         post: operations["create_organization"];
         delete?: never;
