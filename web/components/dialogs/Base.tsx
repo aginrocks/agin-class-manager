@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 interface BaseDilogProps extends ComponentProps<typeof DialogPrimitive.Root> {
   title: string;
   children: ReactNode;
-  className: HTMLAttributes<HTMLDivElement>["className"];
+  className?: HTMLAttributes<HTMLDivElement>["className"];
   innerClassName?: HTMLAttributes<HTMLDivElement>["className"];
 }
 

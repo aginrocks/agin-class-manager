@@ -16,7 +16,7 @@ export type DialogDefinition<
 
 export type DialogName = keyof Dialogs;
 export type DialogPayload<T extends DialogName> = Dialogs[T]["payload"];
-export type DialogReturnValue<T extends DialogName> = Dialogs[T]["payload"];
+export type DialogReturnValue<T extends DialogName> = Dialogs[T]["returnValue"];
 type DialogVisibilityState = "open" | "closed";
 
 export type DialogStateItem<T extends DialogName> = {

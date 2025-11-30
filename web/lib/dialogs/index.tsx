@@ -29,7 +29,7 @@ export function DialogManager({ children }: { children: ReactNode }) {
           ...old,
           [dialogName]: {
             name: dialogName,
-            dialog: dialogPayload,
+            payload: dialogPayload,
             visibilityState: "open",
             resolve,
           },

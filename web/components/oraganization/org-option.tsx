@@ -26,7 +26,9 @@ export default function OrgOption({
           className={size == "large" ? "rounded-2xl" : "rounded-md"}
         />
       ) : (
-        <div className="w-[50px] h-[50px]">{name.charAt(0)}</div>
+        <div className="w-[50] h-[50] flex justify-center items-center">
+          <div className="font-bold text-2xl">{name.charAt(0)}</div>
+        </div>
       )}
       <div>
         {size == "large" && (
