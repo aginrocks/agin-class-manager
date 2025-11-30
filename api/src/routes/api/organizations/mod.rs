@@ -14,7 +14,7 @@ use crate::{
 pub fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_organizations))
-        .nest("/create", create::routes())
+        .merge(create::routes())
         .nest("/{org_id}", org_id::routes())
 }
 
