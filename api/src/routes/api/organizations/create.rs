@@ -8,10 +8,9 @@ use crate::{
     axum_error::{AxumError, AxumResult},
     middlewares::require_auth::{UnauthorizedError, UserId},
     models::{
-        organization::{MutableOrganization, PartialOrganization},
+        organization::{MutableOrganization, Organization, PartialOrganization},
         user::{Membership, OrganizationRole},
     },
-    routes::api::CreateSuccess,
     state::AppState,
 };
 
@@ -32,7 +31,7 @@ fn sanitize(s: &str) -> String {
     path = "/",
     request_body = MutableOrganization,
     responses(
-        (status = OK, description = "Success", body = CreateSuccess),
+        (status = OK, description = "Success", body = Organization),
         (status = UNAUTHORIZED, description = "Unauthorized", body = UnauthorizedError, content_type = "application/json")
     ),
     tag = "Organizations"
@@ -41,7 +40,7 @@ async fn create_organization(
     Extension(user_id): Extension<UserId>,
     State(state): State<AppState>,
     Valid(body): Valid<Json<MutableOrganization>>,
-) -> AxumResult<Json<CreateSuccess>> {
+) -> AxumResult<Json<Organization>> {
     let slug = match &body.slug {
         Some(slug) => slug.to_owned(),
         None => sanitize(&body.name),
@@ -55,16 +54,22 @@ async fn create_organization(
         )));
     }
 
+    let name = body.name.clone();
+    let description = body.description.clone();
+    let avatar_url = body.avatar_url.clone();
+    let members = vec![Membership {
+        user_id: user_id.0,
+        role: OrganizationRole::Admin,
+    }];
+    let budget = 0;
+
     let organization = PartialOrganization {
-        name: body.name.clone(),
-        description: body.description.clone(),
-        slug: slug,
-        avatar_url: body.avatar_url.clone(),
-        members: vec![Membership {
-            user_id: user_id.0,
-            role: OrganizationRole::Admin,
-        }],
-        budget: 0,
+        name: name.clone(),
+        description: description.clone(),
+        slug: slug.clone(),
+        avatar_url: avatar_url.clone(),
+        members: members.clone(),
+        budget,
     };
 
     let inserted_org = state
@@ -78,8 +83,15 @@ async fn create_organization(
     let id = inserted_org
         .inserted_id
         .as_object_id()
-        .wrap_err("Failed to fetch organization ID")?
-        .to_string();
+        .wrap_err("Failed to fetch organization ID")?;
 
-    Ok(Json(CreateSuccess { success: true, id }))
+    Ok(Json(Organization {
+        id,
+        name,
+        slug,
+        description,
+        avatar_url,
+        budget,
+        members,
+    }))
 }

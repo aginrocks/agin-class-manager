@@ -16,11 +16,9 @@ export default function Layout({
 }>) {
   const router = useRouter();
 
-  const {
-    data: user,
-    isFetched,
-    isLoading,
-  } = useQuery($api.queryOptions("get", "/api/user"));
+  const { data: user, isLoading } = useQuery(
+    $api.queryOptions("get", "/api/user"),
+  );
 
   useEffect(() => {
     if (!user) {

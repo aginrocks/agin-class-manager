@@ -21,7 +21,7 @@ export default function BaseDialog({
     <Dialog {...props}>
       <DialogContent
         className={cn(
-          "sm:max-w-3xl w-100 h-150 bg-background/70 dark:bg-background/50 backdrop-blur-sm overflow-hidden flex flex-col",
+          "sm:max-w-3xl w-100 h-fit bg-background/70 dark:bg-background/50 backdrop-blur-sm overflow-hidden flex flex-col",
           className,
         )}>
         <DialogTitle>{title}</DialogTitle>

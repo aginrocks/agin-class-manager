@@ -14,7 +14,7 @@ export function useBindSelectedOrg() {
   const setSelectedOrg = useSetAtom(SelectedOrgAtom);
 
   const { data: organizations, isFetched } = useQuery(
-    $api.queryOptions("get", "/api/organizations")
+    $api.queryOptions("get", "/api/organizations"),
   );
 
   useEffect(() => {

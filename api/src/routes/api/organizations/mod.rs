@@ -32,7 +32,7 @@ async fn get_organizations(
     Extension(state): Extension<AppState>,
     Extension(user_id): Extension<UserId>,
 ) -> AxumResult<Json<Vec<Organization>>> {
-    let courses = state.store.organization.get_all(user_id.0).await?;
+    let organizations = state.store.organization.get_all(user_id.0).await?;
 
-    Ok(Json(courses))
+    Ok(Json(organizations))
 }

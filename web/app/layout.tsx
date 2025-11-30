@@ -38,7 +38,7 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <DialogManager>
               <div className="w-screen h-screen">{children}</div>
             </DialogManager>

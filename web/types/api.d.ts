@@ -204,7 +204,7 @@ export interface components {
             avatar_url?: string | null;
             description: string;
             name: string;
-            slug: string;
+            slug?: string | null;
         };
         /** @example {
          *       "error": "Not Found"
@@ -341,7 +341,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CreateSuccess"];
+                    "application/json": components["schemas"]["Organization"];
                 };
             };
             /** @description Unauthorized */

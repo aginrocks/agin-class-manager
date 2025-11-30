@@ -12,7 +12,7 @@ import { UserAtom } from "@/lib/atoms/user";
 
 export default function Page() {
   const org = useAtomValue(SelectedOrgAtom);
-  const user = useAtomValue(UserAtom);
+  const { data: user } = useQuery($api.queryOptions("get", "/api/user"));
 
   const { data: fundrisings } = useQuery(
     $api.queryOptions(
