@@ -37,7 +37,7 @@ export type TDialogContext = {
   ) => Promise<DialogReturnValue<T>>;
   hide: <T extends DialogName>(
     name: T,
-    returnValue: DialogReturnValue<T>,
+    returnValue?: DialogReturnValue<T>,
   ) => void;
 };
 

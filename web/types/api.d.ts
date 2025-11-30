@@ -90,7 +90,8 @@ export interface paths {
         get: operations["get_organization_by_id"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete organization by id */
+        delete: operations["delete_organization"];
         options?: never;
         head?: never;
         patch?: never;
@@ -239,6 +240,12 @@ export interface components {
             name: string;
         };
         /** @example {
+         *       "success": true
+         *     } */
+        Success: {
+            success: boolean;
+        };
+        /** @example {
          *       "error": "Unauthorized"
          *     } */
         UnauthorizedError: {
@@ -374,6 +381,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Organization"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+        };
+    };
+    delete_organization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization id */
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Success"];
                 };
             };
             /** @description Unauthorized */

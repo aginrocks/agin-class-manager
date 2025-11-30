@@ -9,18 +9,27 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     axum_error::{AxumError, AxumResult},
     middlewares::{
-        require_auth::UnauthorizedError, require_org_permissions::require_org_membership,
+        require_auth::UnauthorizedError,
+        require_org_permissions::{require_org_membership, requre_org_admin},
     },
     models::organization::Organization,
+    routes::api::{CreateSuccess, Success},
     state::AppState,
 };
 
 pub fn routes() -> OpenApiRouter<AppState> {
-    OpenApiRouter::new()
+    let admin = OpenApiRouter::new()
+        .routes(routes!(delete_organization))
+        .layer(middleware::from_fn(requre_org_admin))
+        .layer(middleware::from_fn(require_org_membership));
+
+    let user = OpenApiRouter::new()
         .routes(routes!(get_organization_by_id))
         .nest("/members", members::routes())
         .nest("/fundraising", fundraising::routes())
-        .layer(middleware::from_fn(require_org_membership))
+        .layer(middleware::from_fn(require_org_membership));
+
+    admin.merge(user)
 }
 
 /// Get organization by id
@@ -47,4 +56,26 @@ async fn get_organization_by_id(
     }
 
     Ok(Json(org.unwrap()))
+}
+
+/// Delete organization by id
+#[utoipa::path(
+    method(delete),
+    path = "/",
+    params(
+        ("org_id" = String, Path, description = "Organization id"),
+    ),
+    responses(
+        (status = OK, description = "Success", body = Success, content_type = "application/json"),
+        (status = UNAUTHORIZED, description = "Unauthorized", body = UnauthorizedError, content_type = "application/json")
+    ),
+    tag = "Organizations"
+)]
+async fn delete_organization(
+    Extension(state): Extension<AppState>,
+    Path(org_id): Path<ObjectId>,
+) -> AxumResult<Json<Success>> {
+    state.store.organization.delete(org_id).await?;
+
+    Ok(Json(Success { success: true }))
 }

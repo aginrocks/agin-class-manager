@@ -12,12 +12,14 @@ import { useRouter } from "next/navigation";
 import { SelectedOrgAtom } from "@/lib/atoms/org";
 import { useSetAtom } from "jotai";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { useDialogs } from "@/lib/dialogs";
 
 export default function CreateOrgDialog({
   ...props
 }: ComponentProps<typeof DialogPrimitive.Root> & DialogProps<"CreateOrg">) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const dialogs = useDialogs();
 
   const setSelectedOrg = useSetAtom(SelectedOrgAtom);
   const org = $api.useMutation("post", "/api/organizations");
@@ -31,12 +33,15 @@ export default function CreateOrgDialog({
     await org.mutateAsync({ body: form }).then(
       (res) => {
         setSelectedOrg(res);
+        dialogs.hide("CreateOrg");
         router.push("/dashboard");
         queryClient.invalidateQueries({
           queryKey: $api.queryOptions("get", "/api/user").queryKey,
         });
       },
-      (e) => alert(`Something went wrong: ${e.error}`),
+      (e) => {
+        alert(`Something went wrong: ${e.error}`);
+      },
     );
   }
 

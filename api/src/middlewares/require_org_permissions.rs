@@ -52,7 +52,7 @@ pub async fn require_org_membership(
 
     if is_member.is_none() {
         return Err(AxumError::forbidden(eyre!(
-            "You are not a member of this class"
+            "You are not a member of this organization"
         )));
     }
 

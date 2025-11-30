@@ -42,3 +42,9 @@ pub struct CreateSuccess {
     success: bool,
     id: String,
 }
+
+#[derive(Serialize, ToSchema)]
+#[schema(example = json!({"success": true}))]
+pub struct Success {
+    success: bool,
+}

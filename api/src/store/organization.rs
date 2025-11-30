@@ -79,4 +79,13 @@ impl OrganizationStore {
 
         Ok(())
     }
+
+    pub async fn delete(&self, id: ObjectId) -> AxumResult<()> {
+        self.collection
+            .delete_one(doc! {"_id": id})
+            .await
+            .wrap_err("Failed to delete organization")?;
+
+        Ok(())
+    }
 }
