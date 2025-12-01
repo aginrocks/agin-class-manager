@@ -13,10 +13,14 @@ import { useQuery } from "@tanstack/react-query";
 import { $api } from "@/lib/providers/api";
 import { SelectedOrgAtom, TSelectedOrgAtom } from "@/lib/atoms/org";
 import { useAtom } from "jotai";
+import { IconPlus } from "@tabler/icons-react";
+import { useDialogs } from "@/lib/dialogs";
 
 export function NavOrganization() {
+  const dialogs = useDialogs();
+
   const { data: organizations } = useQuery(
-    $api.queryOptions("get", "/api/organizations")
+    $api.queryOptions("get", "/api/organizations"),
   );
 
   const [selecrtedOrg, setSelectedOrg] = useAtom(SelectedOrgAtom);
@@ -52,6 +56,14 @@ export function NavOrganization() {
                   />
                 </DropdownMenuItem>
               ))}
+              <DropdownMenuItem onClick={() => dialogs.show("CreateOrg")}>
+                <div className="p-2 flex justify-center items-center w-full gap-4">
+                  <IconPlus className="[&_svg:not([class*='size-'])]:size-4 text-white" />
+                  <div className="text-md font-bold">
+                    Create an organization
+                  </div>
+                </div>
+              </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>

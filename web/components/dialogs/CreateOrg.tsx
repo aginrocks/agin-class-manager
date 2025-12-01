@@ -38,6 +38,9 @@ export default function CreateOrgDialog({
         queryClient.invalidateQueries({
           queryKey: $api.queryOptions("get", "/api/user").queryKey,
         });
+        queryClient.invalidateQueries({
+          queryKey: $api.queryOptions("get", "/api/organizations").queryKey,
+        });
       },
       (e) => {
         alert(`Something went wrong: ${e.error}`);

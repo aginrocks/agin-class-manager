@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 interface OrgOptionProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -17,16 +18,22 @@ export default function OrgOption({
       {...props}
       className=" rounded-md cursor-pointer flex justify-start items-center gap-2">
       {image ? (
-        <Image
+        <img
           src={image}
           alt="organization logo"
           width={size == "large" ? 50 : 30}
           height={size == "large" ? 50 : 30}
-          objectFit="cover"
-          className={size == "large" ? "rounded-2xl" : "rounded-md"}
+          className={cn(
+            size == "large" ? "rounded-md" : "rounded-md",
+            " max-h-50, max-w-50 aspect-square object-cover",
+          )}
         />
       ) : (
-        <div className="w-[50] h-[50] flex justify-center items-center">
+        <div
+          className={cn(
+            "flex justify-center items-center",
+            size == "large" ? "w-[50] h-[50]" : "w-[30] h-[30]",
+          )}>
           <div className="font-bold text-2xl">{name.charAt(0)}</div>
         </div>
       )}

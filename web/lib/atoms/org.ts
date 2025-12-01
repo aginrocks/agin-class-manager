@@ -11,14 +11,14 @@ export type TSelectedOrgAtom =
   paths["/api/organizations"]["get"]["responses"]["200"]["content"]["application/json"][0];
 
 export function useBindSelectedOrg() {
-  const setSelectedOrg = useSetAtom(SelectedOrgAtom);
+  const [selectedOrg, setSelectedOrg] = useAtom(SelectedOrgAtom);
 
   const { data: organizations, isFetched } = useQuery(
     $api.queryOptions("get", "/api/organizations"),
   );
 
   useEffect(() => {
-    if (organizations) {
+    if (organizations && !selectedOrg) {
       setSelectedOrg(organizations?.[0] || null);
     } else if (isFetched && !organizations) {
       console.log("No organizations found");
