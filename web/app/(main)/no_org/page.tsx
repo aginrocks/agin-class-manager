@@ -78,7 +78,7 @@ export default function Page() {
         </DropdownMenu>
       </div>
       <div className="text-xl font-bold">
-        Looks like you don't have any organization yet
+        Looks like you don&apos;t have any organization yet
       </div>
       <Button onClick={() => dialogs.show("CreateOrg")}>
         Create an organization

@@ -28,7 +28,7 @@ export default function SettingsPage() {
     });
 
     if (confirm) {
-      let res = await deleteOrg
+      await deleteOrg
         .mutateAsync({
           params: {
             path: { org_id: org._id },

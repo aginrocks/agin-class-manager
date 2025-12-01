@@ -1,4 +1,4 @@
-import type { components, paths } from "@/types/api";
+import type { paths } from "@/types/api";
 import createFetchClient from "openapi-fetch";
 import createClient from "openapi-react-query";
 

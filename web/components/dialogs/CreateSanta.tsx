@@ -77,7 +77,7 @@ export default function CreateSantaDialog({
     try {
       await santamut.mutateAsync({
         params: {
-          //@ts-expect-error
+          //@ts-expect-error undefined type for some reason
           path: {
             org_id: org._id,
           },
@@ -86,7 +86,7 @@ export default function CreateSantaDialog({
           start_date: startDate.toISOString(),
           participants,
           end_date: endDate.toISOString(),
-          propositions_due: propositionsDue.toISOString() as any,
+          propositions_due: propositionsDue.toISOString(),
         },
       });
 
