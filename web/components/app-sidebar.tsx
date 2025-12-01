@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   IconBuildingBroadcastTower,
   IconDashboard,
+  IconGift,
   IconListDetails,
   IconSettings,
 } from "@tabler/icons-react";
@@ -40,10 +41,15 @@ const data = {
       url: "/budget",
       icon: IconListDetails,
     },
+    // {
+    //   title: "Announcements",
+    //   url: "#",
+    //   icon: IconBuildingBroadcastTower,
+    // },
     {
-      title: "Announcements",
-      url: "#",
-      icon: IconBuildingBroadcastTower,
+      title: "Secret Santa",
+      url: "/secret-santa",
+      icon: IconGift,
     },
   ],
   navSecondary: [

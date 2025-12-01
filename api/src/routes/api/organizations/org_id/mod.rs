@@ -1,5 +1,6 @@
 mod fundraising;
 mod members;
+mod santa;
 
 use axum::{Extension, Json, extract::Path, middleware};
 use color_eyre::eyre;
@@ -27,6 +28,7 @@ pub fn routes() -> OpenApiRouter<AppState> {
         .routes(routes!(get_organization_by_id))
         .nest("/members", members::routes())
         .nest("/fundraising", fundraising::routes())
+        .nest("/santa", santa::routes())
         .layer(middleware::from_fn(require_org_membership));
 
     admin.merge(user)
