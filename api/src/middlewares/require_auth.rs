@@ -1,11 +1,6 @@
 use std::ops::Deref;
 
-use axum::{
-    Extension,
-    extract::{Request, State},
-    middleware::Next,
-    response::Response,
-};
+use axum::{Extension, extract::Request, middleware::Next, response::Response};
 use axum_oidc::OidcClaims;
 use color_eyre::eyre::{self, ContextCompat};
 use mongodb::{
@@ -43,7 +38,7 @@ impl Deref for UserId {
 pub async fn require_auth(
     claims: Option<OidcClaims<GroupClaims>>,
     Extension(state): Extension<AppState>,
-    session: Session,
+    _session: Session,
     mut request: Request,
     next: Next,
 ) -> AxumResult<Response> {

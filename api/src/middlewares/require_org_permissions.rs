@@ -1,13 +1,12 @@
 use axum::{
     Extension,
-    extract::{Path, Request, State},
+    extract::{Path, Request},
     middleware::Next,
     response::Response,
 };
 use color_eyre::eyre::eyre;
 use mongodb::bson::{doc, oid::ObjectId};
 use serde::{Deserialize, Serialize};
-use tower_sessions::Session;
 use utoipa::ToSchema;
 
 use crate::{
@@ -15,7 +14,7 @@ use crate::{
     middlewares::require_auth::UserData,
     models::{
         organization::Organization,
-        user::{Membership, OrganizationRole},
+        user::{ OrganizationRole},
     },
     state::AppState,
 };

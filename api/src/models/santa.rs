@@ -45,7 +45,7 @@ database_object!(Santa {
 pub struct MutableSanta {
     participants: Vec<SantaParticipant>,
     start_date: Option<chrono::DateTime<Utc>>,
-    propositions_due: Option<mongodb::bson::DateTime>,
+    propositions_due: Option<chrono::DateTime<Utc>>,
     end_date: Option<chrono::DateTime<Utc>>,
 }
 
@@ -76,7 +76,7 @@ impl Santa {
             id: self.id,
             organization_id: self.organization_id,
             start_date: self.start_date,
-            propositions_due: self.propositions_due,
+            propositions_due: self.propositions_due.map(|a| a.into()),
             end_date: self.end_date,
             participants,
         };

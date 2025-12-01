@@ -73,7 +73,7 @@ async fn create_secret_santa(
         .create(PartialSanta {
             organization_id: org_data.0.id,
             participants,
-            propositions_due: body.propositions_due,
+            propositions_due: body.propositions_due.map(|d| d.into()),
             start_date: body
                 .start_date
                 .map(|dt| dt.into())

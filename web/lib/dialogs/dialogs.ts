@@ -1,6 +1,7 @@
 import CreateOrgDialog from "@/components/dialogs/CreateOrg";
 import { DialogComponents, DialogDefinition } from "./types";
 import ConfirmDialog from "@/components/dialogs/Confirm";
+import CreateSantaDialog from "@/components/dialogs/CreateSanta";
 
 export type Dialogs = {
   CreateOrg: DialogDefinition<{
@@ -17,9 +18,14 @@ export type Dialogs = {
     };
     returnValue: boolean;
   }>;
+  CreateSanta: DialogDefinition<{
+    payload: undefined;
+    returnValue: undefined;
+  }>;
 };
 
 export const dialogBindings: DialogComponents = {
   CreateOrg: CreateOrgDialog,
   Confirm: ConfirmDialog,
+  CreateSanta: CreateSantaDialog,
 };

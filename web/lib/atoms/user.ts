@@ -13,7 +13,7 @@ export function useBindUser() {
   const setUser = useSetAtom(UserAtom);
 
   const { data: userData, isFetched } = useQuery(
-    $api.queryOptions("get", "/api/user")
+    $api.queryOptions("get", "/api/user"),
   );
 
   useEffect(() => {

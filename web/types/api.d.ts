@@ -132,6 +132,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/organizations/{org_id}/santa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a secret santa for an organization */
+        get: operations["get_secret_santa"];
+        put?: never;
+        /** Initialize secret santa */
+        post: operations["create_secret_santa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/user": {
         parameters: {
             query?: never;
@@ -207,11 +225,26 @@ export interface components {
             name: string;
             slug?: string | null;
         };
+        MutableSanta: {
+            /** Format: date-time */
+            end_date?: string | null;
+            participants: components["schemas"]["SantaParticipant"][];
+            /** Format: date-time */
+            propositions_due?: string | null;
+            /** Format: date-time */
+            start_date?: string | null;
+        };
         /** @example {
          *       "error": "Not Found"
          *     } */
         NotFoundError: {
             error: string;
+        };
+        OrgUser: {
+            email: string;
+            id: string;
+            name: string;
+            role: components["schemas"]["OrganizationRole"];
         };
         Organization: {
             _id: string;
@@ -223,6 +256,7 @@ export interface components {
             name: string;
             slug: string;
         };
+        OrganizationResponse: components["schemas"]["Organization"] | components["schemas"]["PopulatedOrganization"];
         /** @enum {string} */
         OrganizationRole: "member" | "admin";
         PatchMemberPayload: {
@@ -232,6 +266,32 @@ export interface components {
         Payer: {
             /** Format: int64 */
             paid_amount: number;
+            user_id: string;
+        };
+        PopulatedOrganization: {
+            _id: string;
+            avatar_url?: string | null;
+            /** Format: int64 */
+            budget: number;
+            description: string;
+            members: components["schemas"]["OrgUser"][];
+            name: string;
+            slug: string;
+        };
+        PopulatedSanta: {
+            _id: string;
+            /** Format: date-time */
+            end_date: string;
+            organization_id: string;
+            participants: components["schemas"]["SantaParticipant"][];
+            /** Format: date-time */
+            propositions_due?: string | null;
+            /** Format: date-time */
+            start_date: string;
+        };
+        SantaParticipant: {
+            present_reciever: string;
+            proposition: string;
             user_id: string;
         };
         StrippedOrg: {
@@ -302,7 +362,10 @@ export interface operations {
     };
     get_organizations: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Include detailed user information for members */
+                "user-details"?: boolean;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -315,7 +378,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Organization"][];
+                    "application/json": components["schemas"]["OrganizationResponse"][];
                 };
             };
             /** @description Unauthorized */
@@ -364,7 +427,10 @@ export interface operations {
     };
     get_organization_by_id: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Include detailed user information for members */
+                "user-details"?: boolean;
+            };
             header?: never;
             path: {
                 /** @description Organization id */
@@ -380,7 +446,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Organization"];
+                    "application/json": components["schemas"]["OrganizationResponse"];
                 };
             };
             /** @description Unauthorized */
@@ -538,6 +604,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NotFoundError"];
+                };
+            };
+        };
+    };
+    get_secret_santa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PopulatedSanta"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+        };
+    };
+    create_secret_santa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MutableSanta"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateSuccess"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedError"];
                 };
             };
         };

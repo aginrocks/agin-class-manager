@@ -3,12 +3,10 @@ use axum::{
 };
 use axum_oidc::{OidcAuthLayer, OidcClient, error::MiddlewareError};
 use color_eyre::Result;
-use color_eyre::eyre::WrapErr;
 use fred::prelude::{ClientLike, Config, Pool};
 use http::StatusCode;
 use mongodb::{Client, Database};
-use serde::{Deserialize, Serialize};
-use std::{net::SocketAddr, ops::Deref, sync::Arc};
+use std::{net::SocketAddr, ops::Deref};
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
 use tower_sessions::{
@@ -16,7 +14,7 @@ use tower_sessions::{
     cookie::{SameSite, time::Duration},
 };
 use tower_sessions_redis_store::RedisStore;
-use tracing::{Instrument, error, info, info_span, instrument, level_filters::LevelFilter};
+use tracing::{Instrument, error, info_span, instrument, level_filters::LevelFilter};
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{
     fmt::format::FmtSpan, layer::SubscriberExt as _, util::SubscriberInitExt as _,
@@ -27,7 +25,7 @@ use utoipa_scalar::{Scalar, Servable as _};
 
 use crate::{
     middlewares::GroupClaims,
-    routes::{self, routes},
+    routes::{self},
     settings::Settings,
     state::AppState,
 };
@@ -50,7 +48,7 @@ pub async fn init_redis(settings: &Settings) -> Result<Pool> {
 }
 
 pub async fn init_session_store(
-    settings: &Settings,
+    _settings: &Settings,
     pool: Pool,
 ) -> Result<SessionManagerLayer<RedisStore<Pool>>> {
     let session_store = RedisStore::<Pool>::new(pool);

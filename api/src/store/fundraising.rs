@@ -49,7 +49,7 @@ impl FundraisingStore {
         &self,
         organization_id: &ObjectId,
     ) -> AxumResult<Vec<Fundraising>> {
-        let mut cursor = self
+        let cursor = self
             .collection
             .find(doc! { "organization_id": organization_id })
             .await

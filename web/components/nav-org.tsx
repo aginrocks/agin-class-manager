@@ -20,7 +20,11 @@ export function NavOrganization() {
   const dialogs = useDialogs();
 
   const { data: organizations } = useQuery(
-    $api.queryOptions("get", "/api/organizations"),
+    $api.queryOptions("get", "/api/organizations", {
+      params: {
+        query: { "user-details": true },
+      },
+    }),
   );
 
   const [selecrtedOrg, setSelectedOrg] = useAtom(SelectedOrgAtom);

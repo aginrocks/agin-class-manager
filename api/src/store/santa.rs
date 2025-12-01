@@ -1,10 +1,10 @@
 use bson::{doc, oid::ObjectId};
-use color_eyre::eyre::{self, Context, eyre};
+use color_eyre::eyre::{Context, eyre};
 use mongodb::Collection;
 
 use crate::{
     axum_error::{AxumError, AxumResult},
-    models::santa::{PartialSanta, Santa, SantaParticipant}, state::AppState,
+    models::santa::{PartialSanta, Santa,},
 };
 
 #[derive(Clone)]
@@ -55,6 +55,4 @@ impl SantaStore {
 
         Ok(santa.unwrap())
     }
-    
-   
 }
