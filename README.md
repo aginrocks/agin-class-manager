@@ -18,10 +18,12 @@ In other words this is an app for class treasurers to make their life easier or 
   <img src="./images/login.png" alt="login screen"/>
   <img src="./images/logout.png" alt="logout screen" />
   <img src="./images/organizations.png" alt="logout screen" />
+- creating an organization
+- secret santa management
+- organization settings
 
 ### **Somewhat working** _(this functions work but only over bare api)_:
 
-- creating an organization
 - creating a fundraising
 - adding a member to an organization
 
