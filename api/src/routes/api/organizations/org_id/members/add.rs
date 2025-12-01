@@ -1,5 +1,5 @@
-use axum::{Extension, Json, body::Body, extract::Path};
-use color_eyre::eyre::{self, eyre};
+use axum::{Extension, Json};
+use color_eyre::eyre::{ eyre};
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;

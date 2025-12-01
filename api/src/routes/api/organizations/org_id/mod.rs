@@ -19,7 +19,7 @@ use crate::{
         require_org_permissions::{require_org_membership, requre_org_admin},
     },
     models::organization::{Organization, PopulatedOrganization},
-    routes::api::{CreateSuccess, Success},
+    routes::api::Success,
     state::AppState,
 };
 
@@ -40,14 +40,14 @@ pub fn routes() -> OpenApiRouter<AppState> {
 }
 
 #[derive(Deserialize)]
-struct GetOrgQuery {
+pub struct GetOrgQuery {
     #[serde(default, rename = "user-details")]
-    user_details: bool,
+    pub user_details: bool,
 }
 
 #[derive(serde::Serialize, utoipa::ToSchema)]
 #[serde(untagged)]
-enum OrganizationResponse {
+pub enum OrganizationResponse {
     Basic(Organization),
     Populated(PopulatedOrganization),
 }

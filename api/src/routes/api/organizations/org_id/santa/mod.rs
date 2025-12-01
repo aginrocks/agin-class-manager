@@ -9,7 +9,7 @@ use crate::{
         require_auth::UnauthorizedError,
         require_org_permissions::{OrganizationData, requre_org_admin},
     },
-    models::santa::{MutableSanta, PartialSanta, PartialSantaParticipant, PopulatedSanta, Santa},
+    models::santa::{MutableSanta, PartialSanta, PartialSantaParticipant, PopulatedSanta},
     routes::api::CreateSuccess,
     state::AppState,
 };
@@ -43,11 +43,11 @@ async fn create_secret_santa(
 ) -> AxumResult<Json<CreateSuccess>> {
     let mut participants = vec![];
     for participant in &body.participants {
-        if (org_data
+        if org_data
             .0
             .members
             .iter()
-            .any(|member| member.user_id != participant.user_id))
+            .any(|member| member.user_id != participant.user_id)
         {
             return Err(AxumError::bad_request(eyre!(
                 "All participants must be in the organization"

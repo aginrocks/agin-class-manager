@@ -1,7 +1,7 @@
 mod add;
 
 use axum::middleware;
-use utoipa_axum::{router::OpenApiRouter, routes};
+use utoipa_axum::router::OpenApiRouter;
 
 use crate::{middlewares::require_org_permissions::requre_org_admin, state::AppState};
 

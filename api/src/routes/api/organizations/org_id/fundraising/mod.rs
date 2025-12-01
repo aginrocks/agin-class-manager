@@ -10,7 +10,7 @@ use crate::{
         require_org_permissions::{OrganizationData, requre_org_admin},
     },
     models::fundraising::{Fundraising, MutableFundraising, PartialFundraising},
-    routes::{self, api::CreateSuccess},
+    routes::{ api::CreateSuccess},
     state::AppState,
 };
 
