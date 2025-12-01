@@ -1,14 +1,15 @@
 use axum::{Extension, Json, extract::State, middleware};
 use axum_valid::Valid;
+use color_eyre::eyre::eyre;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    axum_error::AxumResult,
+    axum_error::{AxumError, AxumResult},
     middlewares::{
         require_auth::UnauthorizedError,
         require_org_permissions::{OrganizationData, requre_org_admin},
     },
-    models::santa::{MutableSanta, PartialSanta, PartialSantaParticipant, Santa},
+    models::santa::{MutableSanta, PartialSanta, PartialSantaParticipant, PopulatedSanta, Santa},
     routes::api::CreateSuccess,
     state::AppState,
 };
@@ -32,7 +33,7 @@ pub fn routes() -> OpenApiRouter<AppState> {
         (status = OK, description = "Success", body = CreateSuccess),
         (status = UNAUTHORIZED, description = "Unauthorized", body = UnauthorizedError, content_type = "application/json")
     ),
-    tag = "Fundraising"
+    tag = "Secret santa"
 )]
 #[axum::debug_handler]
 async fn create_secret_santa(
@@ -42,6 +43,17 @@ async fn create_secret_santa(
 ) -> AxumResult<Json<CreateSuccess>> {
     let mut participants = vec![];
     for participant in &body.participants {
+        if (org_data
+            .0
+            .members
+            .iter()
+            .any(|member| member.user_id != participant.user_id))
+        {
+            return Err(AxumError::bad_request(eyre!(
+                "All participants must be in the organization"
+            )));
+        }
+
         let oid = state
             .store
             .santa_participant
@@ -84,19 +96,21 @@ async fn create_secret_santa(
     method(get),
     path = "/",
     responses(
-        (status = OK, description = "Success", body = Santa, content_type = "application/json"),
+        (status = OK, description = "Success", body = PopulatedSanta, content_type = "application/json"),
         (status = UNAUTHORIZED, description = "Unauthorized", body = UnauthorizedError, content_type = "application/json")
     ),
-    tag = "Fundraising"
+    tag = "Secret santa"
 )]
 async fn get_secret_santa(
     Extension(state): Extension<AppState>,
     Extension(org_data): Extension<OrganizationData>,
-) -> AxumResult<Json<Santa>> {
+) -> AxumResult<Json<PopulatedSanta>> {
     let santa = state
         .store
         .santa
         .get_by_organization(&org_data.0.id)
+        .await?
+        .populate_participants(state)
         .await?;
 
     Ok(Json(santa))
