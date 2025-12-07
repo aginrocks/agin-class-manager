@@ -2,7 +2,7 @@ mod create;
 // mod org_id;
 
 use axum::{Extension, Json, extract::Query};
-use sea_orm::ModelTrait;
+use sea_orm::{ModelTrait, QueryFilter};
 use serde::Deserialize;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -10,8 +10,7 @@ use crate::{
     axum_error::AxumResult,
     middlewares::require_auth::UnauthorizedError,
     models::{
-        organization::{self, PopulatedOrganization},
-        user,
+        org_members, organization::{self, OrgUser, PopulatedOrganization}, user
     },
     // routes::api::organizations::org_id::{GetOrgQuery, OrganizationResponse},
     state::AppState,
@@ -61,18 +60,18 @@ async fn get_organizations(
     if query.user_details {
         let mut populated = Vec::new();
         for org in organizations {
-            let pop = org.find_related(user::Entity).all(&state.sea_orm).await?;
+            let users = org.find_related(user::Entity).select_with(org_members::Entity).all(&state.sea_orm).await?;
 
-            dbg!(pop);
 
-            // let pop = if let Some(org) = pop {
-            //     org
-            // }
-            // else {
-            //     continue;
-            // };
 
-            // populated.push(OrganizationResponse::Populated(PopulatedOrganization { id: pop., name: (), description: (), slug: (), members: (), avatar_url: (), budget: () }));
+            let members = users.iter().map(|user| return OrgUser{
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role:
+            })
+
+            populated.push(OrganizationResponse::Populated(PopulatedOrganization { id: org.id, name: org.name, description: org.description, slug: org.slug, members: pop, avatar_url: (), budget: () }));
         }
         Ok(Json(populated))
     } else {
