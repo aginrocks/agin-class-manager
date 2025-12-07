@@ -48,7 +48,7 @@ pub struct PopulatedOrganization {
     slug: String,
     members: Vec<OrgUser>,
     avatar_url: Option<String>,
-    budget: u64,
+    budget: i64,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Validate)]

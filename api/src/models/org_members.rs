@@ -25,9 +25,9 @@ pub enum OrganizationRole {
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize)]
 #[sea_orm(table_name = "org_members")]
 pub struct Model {
-    #[sea_orm(primary_key, auto_increment = false)]
+    #[sea_orm(primary_key, auto_increment = false, unique_key = "org_member")]
     pub org_id: i64,
-    #[sea_orm(primary_key, auto_increment = false)]
+    #[sea_orm(primary_key, auto_increment = false, unique_key = "org_member")]
     pub user_id: i64,
     #[sea_orm(belongs_to, from = "org_id", to = "id")]
     pub organization: Option<super::organization::Entity>,
@@ -38,7 +38,7 @@ pub struct Model {
 
 impl ActiveModelBehavior for ActiveModel {}
 
-#[derive(Serialize, Deserialize, ToSchema)]
+#[derive(Serialize, Deserialize, ToSchema, Clone)]
 #[StructFields(pub)]
 pub struct Membership {
     user_id: i64,

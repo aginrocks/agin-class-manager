@@ -14,6 +14,7 @@ use crate::{
     axum_error::{AxumError, AxumResult},
     models::{
         self,
+        org_members::{self, Membership},
         organization::{self},
     },
     state::AppState,
@@ -23,12 +24,6 @@ use crate::{
 pub struct Params {
     org_id: i64,
 }
-
-// #[derive(Clone, Debug, Serialize, ToSchema, Deserialize)]
-// pub struct MembershipData(pub crate::models::user::Membership);
-
-// #[derive(Clone, Debug, Serialize, ToSchema, Deserialize)]
-// pub struct OrganizationData(pub Organization);
 
 pub async fn require_org_membership(
     Extension(state): Extension<AppState>,
@@ -61,22 +56,28 @@ pub async fn require_org_membership(
     let member = org
         .find_related(models::user::Entity)
         .filter(models::user::Column::Id.eq(user.id))
+        .select_also(org_members::Entity)
         .one(&state.sea_orm)
         .await?;
 
-    if member.is_none() {
+    let Some(member) = member else {
         return Err(AxumError::forbidden(eyre!(
             "You are not a member of this organization"
         )));
-    }
+    };
 
-    // request
-    //     .extensions_mut()
-    //     .insert(MembershipData(is_member.unwrap().clone()));
+    let Some(role) = member.1 else {
+        return Err(AxumError::forbidden(eyre!(
+            "You are not a member of this organization"
+        )));
+    };
 
-    // request
-    //     .extensions_mut()
-    //     .insert(OrganizationData(org_data.clone()));
+    let membership = Membership {
+        role: role.role,
+        user_id: member.0.id,
+    };
+
+    request.extensions_mut().insert(membership);
 
     Ok(next.run(request).await)
 }
