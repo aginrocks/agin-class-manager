@@ -7,6 +7,7 @@ use mongodb::{
     options::ReturnDocument,
 };
 use sea_orm::ActiveValue::{NotSet, Set};
+use sea_orm::sea_query::OnConflict;
 use sea_orm::{ActiveModelTrait, EntityTrait, ModelTrait};
 use serde::{Deserialize, Serialize};
 use std::ops::Deref;
@@ -19,26 +20,25 @@ use crate::{
     middlewares::GroupClaims,
     models::{
         token::{self, AccessToken},
-        user::{self, User},
+        user::{self},
     },
     state::AppState,
     utils::hash_pat,
 };
 
-/// User data type for request extensions
-#[derive(Clone, Debug, Serialize, ToSchema, Deserialize)]
-pub struct UserData(pub User);
+// #[derive(Clone, Debug, Serialize, ToSchema, Deserialize)]
+// pub struct UserData(pub User);
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct UserId(pub ObjectId);
+// #[derive(Clone, Debug, Serialize, Deserialize)]
+// pub struct UserId(pub ObjectId);
 
-impl Deref for UserId {
-    type Target = ObjectId;
+// impl Deref for UserId {
+//     type Target = ObjectId;
 
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
+//     fn deref(&self) -> &Self::Target {
+//         &self.0
+//     }
+// }
 
 /// Middleware that ensures the user is authenticated
 pub async fn require_auth(
@@ -93,40 +93,29 @@ pub async fn require_auth(
         .to_string();
     let email = claims.email().wrap_err("Email is required")?.to_string();
 
-    let user = user::ActiveModel {
+    let user_model = user::ActiveModel {
         email: Set(email),
         name: Set(name),
         subject: Set(sub),
-        id: NotSet,
+        ..Default::default()
     };
 
-    let user = user.save(&state.sea_orm).await?;
+    let user = user::Entity::insert(user_model)
+        .on_conflict(
+            OnConflict::column(user::Column::Subject)
+                .update_columns([user::Column::Email, user::Column::Name])
+                .to_owned(),
+        )
+        .exec_with_returning(&state.sea_orm)
+        .await?;
 
-    // let user = state
-    //     .database
-    //     .collection::<User>("users")
-    //     .find_one_and_update(
-    //         doc! { "sub": &sub },
-    //         doc! {
-    //             "$set": {
-    //                 "subject": sub,
-    //                 "name": name,
-    //                 "email": email,
-    //             }
-    //         },
-    //     )
-    //     .upsert(true)
-    //     .return_document(ReturnDocument::After)
-    //     .await?
-    //     .wrap_err("User not found (wtf?)")?;
-
-    // let orgs = user
-    //     .find_related(organization::Entity)
-    //     .all(&state.sea_orm)
-    //     .await?;
+    let orgs = user
+        .find_related(organization::Entity)
+        .all(&state.sea_orm)
+        .await?;
 
     request.extensions_mut().insert(user);
-    // request.extensions_mut().insert(orgs);
+    request.extensions_mut().insert(orgs);
 
     Ok(next.run(request).await)
 }

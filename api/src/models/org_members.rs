@@ -1,6 +1,7 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use visible::StructFields;
 
 #[derive(
     Serialize,
@@ -36,3 +37,10 @@ pub struct Model {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+#[derive(Serialize, Deserialize, ToSchema)]
+#[StructFields(pub)]
+pub struct Membership {
+    user_id: i64,
+    role: OrganizationRole,
+}

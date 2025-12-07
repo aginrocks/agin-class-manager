@@ -55,7 +55,7 @@ use sea_orm::entity::prelude::*;
 
 #[sea_orm::model]
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize)]
-#[sea_orm(table_name = "organizations")]
+#[sea_orm(table_name = "fundrisings")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,

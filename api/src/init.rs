@@ -32,9 +32,7 @@ use crate::{
 
 pub async fn init_sea_orm(settings: &Settings) -> Result<sea_orm::DatabaseConnection> {
     let db = sea_orm::Database::connect(settings.sea_orm.connection_string.clone()).await?;
-    db.get_schema_registry("server::entity::*")
-        .sync(&db)
-        .await?;
+    db.get_schema_registry("api::models::*").sync(&db).await?;
 
     Ok(db)
 }

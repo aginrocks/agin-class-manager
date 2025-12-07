@@ -1,15 +1,16 @@
 use axum::{Extension, Json, extract::State};
 use axum_valid::Valid;
-use color_eyre::eyre::{self, Context, ContextCompat};
 use regex::Regex;
+use sea_orm::{ActiveValue::Set, EntityTrait};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    axum_error::{AxumError, AxumResult},
-    middlewares::require_auth::{UnauthorizedError, UserId},
+    axum_error::AxumResult,
+    middlewares::require_auth::UnauthorizedError,
     models::{
-        organization::{MutableOrganization, Organization, PartialOrganization},
-        user::{Membership, OrganizationRole},
+        org_members::{self, Membership},
+        organization::{self, MutableOrganization, OrganizationRes},
+        user,
     },
     state::AppState,
 };
@@ -31,67 +32,58 @@ fn sanitize(s: &str) -> String {
     path = "/",
     request_body = MutableOrganization,
     responses(
-        (status = OK, description = "Success", body = Organization),
+        (status = OK, description = "Success", body = OrganizationRes),
         (status = UNAUTHORIZED, description = "Unauthorized", body = UnauthorizedError, content_type = "application/json")
     ),
     tag = "Organizations"
 )]
 async fn create_organization(
-    Extension(user_id): Extension<UserId>,
+    Extension(user): Extension<user::Model>,
     State(state): State<AppState>,
     Valid(body): Valid<Json<MutableOrganization>>,
-) -> AxumResult<Json<Organization>> {
+) -> AxumResult<Json<OrganizationRes>> {
     let slug = match &body.slug {
         Some(slug) => slug.to_owned(),
         None => sanitize(&body.name),
     };
 
-    let already_exists = state.store.organization.get_by_slug(&slug).await?;
+    dbg!(body.description.clone());
 
-    if already_exists.is_some() {
-        return Err(AxumError::forbidden(eyre::eyre!(
-            "Organization with this slug already exists"
-        )));
-    }
-
-    let name = body.name.clone();
-    let description = body.description.clone();
-    let avatar_url = body.avatar_url.clone();
-    let members = vec![Membership {
-        user_id: user_id.0,
-        role: OrganizationRole::Admin,
-    }];
-    let budget = 0;
-
-    let organization = PartialOrganization {
-        name: name.clone(),
-        description: description.clone(),
-        slug: slug.clone(),
-        avatar_url: avatar_url.clone(),
-        members: members.clone(),
-        budget,
+    let organization_model = organization::ActiveModel {
+        name: Set(body.name.clone()),
+        description: Set(body.description.clone()),
+        avatar_url: Set(body.avatar_url.clone()),
+        slug: Set(slug),
+        budget: Set(0),
+        ..Default::default()
     };
 
-    let inserted_org = state
-        .store
-        .organization
-        .partial_collection
-        .insert_one(organization)
-        .await
-        .wrap_err("Failed to create organization")?;
+    let organization = organization::Entity::insert(organization_model)
+        .exec_with_returning(&state.sea_orm)
+        .await?;
 
-    let id = inserted_org
-        .inserted_id
-        .as_object_id()
-        .wrap_err("Failed to fetch organization ID")?;
+    let members = org_members::ActiveModel {
+        user_id: Set(user.id),
+        org_id: Set(organization.id.clone()),
+        role: Set(org_members::OrganizationRole::Admin),
+    };
 
-    Ok(Json(Organization {
-        id,
-        name,
-        slug,
-        description,
-        avatar_url,
-        budget,
-        members,
+    let org_members = org_members::Entity::insert(members)
+        .exec_with_returning(&state.sea_orm)
+        .await?;
+
+    let membership = Membership {
+        role: org_members.role,
+        user_id: user.id,
+    };
+
+    Ok(Json(OrganizationRes {
+        id: organization.id,
+        name: organization.name,
+        slug: organization.slug,
+        description: organization.description,
+        avatar_url: organization.avatar_url,
+        budget: organization.budget,
+        members: vec![membership],
     }))
 }

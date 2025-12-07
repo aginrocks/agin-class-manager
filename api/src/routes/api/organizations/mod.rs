@@ -1,15 +1,16 @@
-// mod create;
+mod create;
 // mod org_id;
 
 use axum::{Extension, Json, extract::Query};
+use sea_orm::ModelTrait;
 use serde::Deserialize;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     axum_error::AxumResult,
-    middlewares::require_auth::{UnauthorizedError, UserId},
+    middlewares::require_auth::UnauthorizedError,
     models::{
-        organization::{self, Organization, PopulatedOrganization},
+        organization::{self, PopulatedOrganization},
         user,
     },
     // routes::api::organizations::org_id::{GetOrgQuery, OrganizationResponse},
@@ -17,8 +18,9 @@ use crate::{
 };
 
 pub fn routes() -> OpenApiRouter<AppState> {
-    OpenApiRouter::new().routes(routes!(get_organizations))
-    // .merge(create::routes())
+    OpenApiRouter::new()
+        .routes(routes!(get_organizations))
+        .merge(create::routes())
     // .nest("/{org_id}", org_id::routes())
 }
 
@@ -31,7 +33,7 @@ pub struct GetOrgQuery {
 #[derive(serde::Serialize, utoipa::ToSchema)]
 #[serde(untagged)]
 pub enum OrganizationResponse {
-    Basic(Organization),
+    Basic(organization::Model),
     Populated(PopulatedOrganization),
 }
 
@@ -53,21 +55,33 @@ async fn get_organizations(
     Extension(user): Extension<user::Model>,
     Extension(organizations): Extension<Vec<organization::Model>>,
     Query(query): Query<GetOrgQuery>,
-) -> AxumResult<Json<Vec<organization::Model>>> {
-    // if query.user_details {
-    //     let mut populated = Vec::new();
-    //     for org in organizations {
-    //         let pop = org.populate_users(state.clone()).await?;
-    //         populated.push(OrganizationResponse::Populated(pop));
-    //     }
-    //     Ok(Json(populated))
-    // } else {
-    //     let basic: Vec<OrganizationResponse> = organizations
-    //         .into_iter()
-    //         .map(|org| OrganizationResponse::Basic(org))
-    //         .collect();
-    //     Ok(Json(basic))
-    // }
-    //
-    Ok(Json(organizations))
+) -> AxumResult<Json<Vec<OrganizationResponse>>> {
+    dbg!("get_organizations");
+    dbg!(&query.user_details);
+    if query.user_details {
+        let mut populated = Vec::new();
+        for org in organizations {
+            let pop = org.find_related(user::Entity).all(&state.sea_orm).await?;
+
+            dbg!(pop);
+
+            // let pop = if let Some(org) = pop {
+            //     org
+            // }
+            // else {
+            //     continue;
+            // };
+
+            // populated.push(OrganizationResponse::Populated(PopulatedOrganization { id: pop., name: (), description: (), slug: (), members: (), avatar_url: (), budget: () }));
+        }
+        Ok(Json(populated))
+    } else {
+        let basic: Vec<OrganizationResponse> = organizations
+            .into_iter()
+            .map(|org| OrganizationResponse::Basic(org))
+            .collect();
+        Ok(Json(basic))
+    }
+
+    // Ok(Json(organizations))
 }

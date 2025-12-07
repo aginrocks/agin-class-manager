@@ -12,10 +12,9 @@ use utoipa::ToSchema;
 
 use crate::{
     axum_error::{AxumError, AxumResult},
-    middlewares::require_auth::UserData,
     models::{
         self,
-        organization::{self, Organization},
+        organization::{self},
     },
     state::AppState,
 };
@@ -25,11 +24,11 @@ pub struct Params {
     org_id: i64,
 }
 
-#[derive(Clone, Debug, Serialize, ToSchema, Deserialize)]
-pub struct MembershipData(pub crate::models::user::Membership);
+// #[derive(Clone, Debug, Serialize, ToSchema, Deserialize)]
+// pub struct MembershipData(pub crate::models::user::Membership);
 
-#[derive(Clone, Debug, Serialize, ToSchema, Deserialize)]
-pub struct OrganizationData(pub Organization);
+// #[derive(Clone, Debug, Serialize, ToSchema, Deserialize)]
+// pub struct OrganizationData(pub Organization);
 
 pub async fn require_org_membership(
     Extension(state): Extension<AppState>,

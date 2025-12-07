@@ -7,7 +7,7 @@ mod mongo_id;
 mod routes;
 mod settings;
 mod state;
-mod store;
+// mod store;
 mod utils;
 pub mod validators;
 
@@ -25,7 +25,6 @@ use crate::{
     },
     settings::Settings,
     state::AppState,
-    store::DatabaseStore,
 };
 
 #[derive(OpenApi)]
@@ -46,13 +45,13 @@ async fn main() -> Result<()> {
 
     let fred = init_redis(&settings).await?;
 
-    let store = DatabaseStore::new(&database);
+    // let store = DatabaseStore::new(&database);
 
     let sea_orm = init_sea_orm(&settings).await?;
 
     let app_state = AppState {
         database,
-        store,
+        // store,
         settings: settings.clone(),
         fred: fred.clone(),
         sea_orm,
