@@ -25,10 +25,10 @@ async fn log_out(
     Extension(token): Extension<token::Model>,
     session: Session,
 ) -> AxumResult<Response> {
-    token
-        .delete(&state.sea_orm)
-        .await
-        .map_err(|_| eyre!("Couldn't delete token"))?;
+    // token
+    //     .delete(&state.sea_orm)
+    //     .await
+    //     .map_err(|_| eyre!("Couldn't delete token"))?;
 
     if let Err(e) = session.flush().await {
         error!("Failed to flush session: {}", e);

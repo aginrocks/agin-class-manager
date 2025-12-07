@@ -6,7 +6,8 @@ use mongodb::{
     bson::{doc, oid::ObjectId},
     options::ReturnDocument,
 };
-use sea_orm::ModelTrait;
+use sea_orm::ActiveValue::{NotSet, Set};
+use sea_orm::{ActiveModelTrait, EntityTrait, ModelTrait};
 use serde::{Deserialize, Serialize};
 use std::ops::Deref;
 use tower_sessions::Session;
@@ -92,26 +93,40 @@ pub async fn require_auth(
         .to_string();
     let email = claims.email().wrap_err("Email is required")?.to_string();
 
-    let user = state
-        .database
-        .collection::<User>("users")
-        .find_one_and_update(
-            doc! { "sub": &sub },
-            doc! {
-                "$set": {
-                    "subject": sub,
-                    "name": name,
-                    "email": email,
-                }
-            },
-        )
-        .upsert(true)
-        .return_document(ReturnDocument::After)
-        .await?
-        .wrap_err("User not found (wtf?)")?;
+    let user = user::ActiveModel {
+        email: Set(email),
+        name: Set(name),
+        subject: Set(sub),
+        id: NotSet,
+    };
 
-    request.extensions_mut().insert(UserData(user.clone()));
-    request.extensions_mut().insert(UserId(user.id));
+    let user = user.save(&state.sea_orm).await?;
+
+    // let user = state
+    //     .database
+    //     .collection::<User>("users")
+    //     .find_one_and_update(
+    //         doc! { "sub": &sub },
+    //         doc! {
+    //             "$set": {
+    //                 "subject": sub,
+    //                 "name": name,
+    //                 "email": email,
+    //             }
+    //         },
+    //     )
+    //     .upsert(true)
+    //     .return_document(ReturnDocument::After)
+    //     .await?
+    //     .wrap_err("User not found (wtf?)")?;
+
+    // let orgs = user
+    //     .find_related(organization::Entity)
+    //     .all(&state.sea_orm)
+    //     .await?;
+
+    request.extensions_mut().insert(user);
+    // request.extensions_mut().insert(orgs);
 
     Ok(next.run(request).await)
 }
