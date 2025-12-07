@@ -2,7 +2,7 @@ use axum::{
     Extension, Json, Router, error_handling::HandleErrorLayer, response::IntoResponse, routing::get,
 };
 use axum_oidc::{OidcAuthLayer, OidcClient, error::MiddlewareError};
-use color_eyre::Result;
+use color_eyre::{Result, eyre::Ok};
 use fred::prelude::{ClientLike, Config, Pool};
 use http::StatusCode;
 use mongodb::{Client, Database};
@@ -29,6 +29,15 @@ use crate::{
     settings::Settings,
     state::AppState,
 };
+
+pub async fn init_sea_orm(settings: &Settings) -> Result<sea_orm::DatabaseConnection> {
+    let db = sea_orm::Database::connect(settings.sea_orm.connection_string.clone()).await?;
+    db.get_schema_registry("server::entity::*")
+        .sync(&db)
+        .await?;
+
+    Ok(db)
+}
 
 pub async fn init_database(settings: &Settings) -> Result<Database> {
     let client = Client::with_uri_str(&settings.db.connection_string).await?;

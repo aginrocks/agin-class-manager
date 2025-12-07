@@ -106,3 +106,28 @@ impl Organization {
         Ok(res)
     }
 }
+
+use sea_orm::entity::prelude::*;
+
+#[sea_orm::model]
+#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize)]
+#[sea_orm(table_name = "organizations")]
+pub struct Model {
+    #[sea_orm(primary_key)]
+    pub id: i32,
+
+    pub name: String,
+
+    pub desciption: String,
+
+    pub slug: String,
+
+    pub avatar_url: String,
+
+    pub budget: u64,
+
+    #[sea_orm(has_many, via = "org_members")]
+    pub members: HasMany<super::user::Entity>,
+}
+
+impl ActiveModelBehavior for ActiveModel {}

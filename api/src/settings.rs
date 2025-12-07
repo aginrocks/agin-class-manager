@@ -53,6 +53,11 @@ pub struct Db {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct SeaOrm {
+    pub connection_string: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Oidc {
     pub issuer: IssuerUrl,
     pub client_id: ClientId,
@@ -70,6 +75,7 @@ pub struct Settings {
     pub db: Db,
     pub oidc: Oidc,
     pub redis: Redis,
+    pub sea_orm: SeaOrm,
 }
 
 impl Settings {
@@ -147,6 +153,9 @@ impl Settings {
             },
             redis: Redis {
                 connection_string: "redis://valkey:6379".to_string(),
+            },
+            sea_orm: SeaOrm {
+                connection_string: "postgres://db:db@localhost/agin-class-manager".to_string(),
             },
         }
     }

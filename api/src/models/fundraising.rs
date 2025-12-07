@@ -9,13 +9,14 @@ use utoipa::ToSchema;
 use validator::Validate;
 use visible::StructFields;
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct Payer {
-    #[schema(value_type = String)]
-    #[serde(with = "object_id_as_string_required")]
-    pub user_id: ObjectId,
+    pub user_id: i64,
     pub paid_amount: u64,
 }
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, FromJsonQueryResult)]
+pub struct PayerVec(pub Vec<Payer>);
 
 database_object!(Fundraising {
     #[serde(
@@ -49,3 +50,21 @@ pub struct MutableFundraising {
     pub start_date: Option<chrono::DateTime<Utc>>,
     pub end_date: Option<chrono::DateTime<Utc>>,
 }
+
+use sea_orm::entity::prelude::*;
+
+#[sea_orm::model]
+#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize)]
+#[sea_orm(table_name = "organizations")]
+pub struct Model {
+    #[sea_orm(primary_key)]
+    pub id: i32,
+    name: String,
+    description: String,
+    payers: PayerVec,
+    total_amount: u64,
+    start_date: Option<chrono::DateTime<Utc>>,
+    end_date: Option<chrono::DateTime<Utc>>,
+}
+
+impl ActiveModelBehavior for ActiveModel {}

@@ -19,7 +19,10 @@ use tracing::info;
 use utoipa::OpenApi;
 
 use crate::{
-    init::{init_axum, init_database, init_listener, init_redis, init_session_store, init_tracing},
+    init::{
+        init_axum, init_database, init_listener, init_redis, init_sea_orm, init_session_store,
+        init_tracing,
+    },
     settings::Settings,
     state::AppState,
     store::DatabaseStore,
@@ -45,11 +48,14 @@ async fn main() -> Result<()> {
 
     let store = DatabaseStore::new(&database);
 
+    let sea_orm = init_sea_orm(&settings).await?;
+
     let app_state = AppState {
         database,
         store,
         settings: settings.clone(),
         fred: fred.clone(),
+        sea_orm,
     };
 
     let session_layer = init_session_store(&settings, fred).await?;

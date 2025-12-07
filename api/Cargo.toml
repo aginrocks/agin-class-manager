@@ -51,3 +51,4 @@ futures = "0.3.31"
 validator = { version = "0.20.0", features = ["derive"] }
 axum-valid = "0.24.0"
 regex = "1.12.2"
+sea-orm = { version = "2.0.0-rc.18", features = ["sqlx-postgres", "runtime-tokio-rustls", "with-chrono", "with-json", "with-uuid", "schema-sync", "entity-registry"] }

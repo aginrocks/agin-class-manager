@@ -1,8 +1,11 @@
+use sea_orm::entity::prelude::*;
+
 use crate::database_object;
 use crate::mongo_id::object_id_as_string_required;
 
 use mongodb::bson::oid::ObjectId;
 use partial_struct::Partial;
+use sea_orm::ActiveModelBehavior;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use visible::StructFields;
@@ -35,3 +38,23 @@ impl From<OrganizationRole> for mongodb::bson::Bson {
         mongodb::bson::serialize_to_bson(&scope).expect("Failed to convert to BSON")
     }
 }
+
+#[sea_orm::model]
+#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize)]
+#[sea_orm(table_name = "users")]
+pub struct Model {
+    #[sea_orm(primary_key)]
+    pub id: i32,
+
+    pub subject: String,
+
+    #[sea_orm(unique)]
+    pub email: String,
+
+    pub name: String,
+
+    #[sea_orm(has_many, via = "org_members")]
+    pub organization: HasMany<super::organization::Entity>,
+}
+
+impl ActiveModelBehavior for ActiveModel {}

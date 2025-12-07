@@ -1,20 +1,23 @@
-use std::ops::Deref;
-
 use axum::{Extension, extract::Request, middleware::Next, response::Response};
 use axum_oidc::OidcClaims;
+use color_eyre::eyre::eyre;
 use color_eyre::eyre::{self, ContextCompat};
 use mongodb::{
     bson::{doc, oid::ObjectId},
     options::ReturnDocument,
 };
 use serde::{Deserialize, Serialize};
+use std::ops::Deref;
 use tower_sessions::Session;
 use utoipa::ToSchema;
 
 use crate::{
     axum_error::{AxumError, AxumResult},
     middlewares::GroupClaims,
-    models::{token::AccessToken, user::User},
+    models::{
+        token::{self, AccessToken},
+        user::{self, User},
+    },
     state::AppState,
     utils::hash_pat,
 };
@@ -53,19 +56,12 @@ pub async fn require_auth(
 
         let hashed_token = hash_pat(token);
 
-        let token = state
-            .database
-            .collection::<AccessToken>("tokens")
-            .find_one(doc! { "hashed_token": hashed_token })
-            .await?
-            .ok_or_else(|| AxumError::unauthorized(eyre::eyre!("Unauthorized")))?;
-
-        let user = state
-            .database
-            .collection::<User>("users")
-            .find_one(doc! { "_id": token.user_id })
-            .await?
-            .wrap_err("User not found (wtf?)")?;
+        let (token, user) = token::Entity::find_by_hashed_token(hashed_token)
+            .find_also_related(user::Entity)
+            .one(&state.sea_orm)
+            .await
+            .map_err(|_| AxumError::unauthorized(eyre!("Unauthorized")))?
+            .ok_or_else(|| AxumError::unauthorized(eyre!("Unauthorized")))?;
 
         request.extensions_mut().insert(UserData(user.clone()));
         request.extensions_mut().insert(UserId(user.id));
