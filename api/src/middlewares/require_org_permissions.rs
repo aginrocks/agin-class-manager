@@ -14,7 +14,7 @@ use crate::{
     axum_error::{AxumError, AxumResult},
     models::{
         self,
-        org_members::{self, Membership},
+        org_members::{self, Membership, OrganizationRole},
         organization::{self},
     },
     state::AppState,
@@ -60,21 +60,15 @@ pub async fn require_org_membership(
         .one(&state.sea_orm)
         .await?;
 
-    let Some(member) = member else {
-        return Err(AxumError::forbidden(eyre!(
-            "You are not a member of this organization"
-        )));
-    };
-
-    let Some(role) = member.1 else {
+    let Some((member, Some(org_members::Model { role, .. }))) = member else {
         return Err(AxumError::forbidden(eyre!(
             "You are not a member of this organization"
         )));
     };
 
     let membership = Membership {
-        role: role.role,
-        user_id: member.0.id,
+        role: role,
+        user_id: member.id,
     };
 
     request.extensions_mut().insert(membership);
@@ -82,16 +76,16 @@ pub async fn require_org_membership(
     Ok(next.run(request).await)
 }
 
-// pub async fn requre_org_admin(
-//     Extension(membership): Extension<MembershipData>,
-//     request: Request,
-//     next: Next,
-// ) -> AxumResult<Response> {
-//     if membership.0.role != OrganizationRole::Admin {
-//         return Err(AxumError::forbidden(eyre!(
-//             "You are not an admin of this organization"
-//         )));
-//     }
+pub async fn requre_org_admin(
+    Extension(membership): Extension<Membership>,
+    request: Request,
+    next: Next,
+) -> AxumResult<Response> {
+    if membership.role != OrganizationRole::Admin {
+        return Err(AxumError::forbidden(eyre!(
+            "You are not an admin of this organization"
+        )));
+    }
 
-//     Ok(next.run(request).await)
-// }
+    Ok(next.run(request).await)
+}
