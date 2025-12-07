@@ -44,7 +44,7 @@ impl From<OrganizationRole> for mongodb::bson::Bson {
 #[sea_orm(table_name = "users")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i32,
+    pub id: i64,
 
     pub subject: String,
 
@@ -54,7 +54,7 @@ pub struct Model {
     pub name: String,
 
     #[sea_orm(has_many, via = "org_members")]
-    pub organization: HasMany<super::organization::Entity>,
+    pub organizations: HasMany<super::organization::Entity>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

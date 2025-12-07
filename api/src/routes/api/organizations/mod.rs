@@ -1,21 +1,38 @@
-mod create;
-mod org_id;
+// mod create;
+// mod org_id;
 
 use axum::{Extension, Json, extract::Query};
+use serde::Deserialize;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     axum_error::AxumResult,
     middlewares::require_auth::{UnauthorizedError, UserId},
-    routes::api::organizations::org_id::{GetOrgQuery, OrganizationResponse},
+    models::{
+        organization::{self, Organization, PopulatedOrganization},
+        user,
+    },
+    // routes::api::organizations::org_id::{GetOrgQuery, OrganizationResponse},
     state::AppState,
 };
 
 pub fn routes() -> OpenApiRouter<AppState> {
-    OpenApiRouter::new()
-        .routes(routes!(get_organizations))
-        .merge(create::routes())
-        .nest("/{org_id}", org_id::routes())
+    OpenApiRouter::new().routes(routes!(get_organizations))
+    // .merge(create::routes())
+    // .nest("/{org_id}", org_id::routes())
+}
+
+#[derive(Deserialize)]
+pub struct GetOrgQuery {
+    #[serde(default, rename = "user-details")]
+    pub user_details: bool,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+#[serde(untagged)]
+pub enum OrganizationResponse {
+    Basic(Organization),
+    Populated(PopulatedOrganization),
 }
 
 /// Get all organizations
@@ -33,23 +50,24 @@ pub fn routes() -> OpenApiRouter<AppState> {
 )]
 async fn get_organizations(
     Extension(state): Extension<AppState>,
-    Extension(user_id): Extension<UserId>,
+    Extension(user): Extension<user::Model>,
+    Extension(organizations): Extension<Vec<organization::Model>>,
     Query(query): Query<GetOrgQuery>,
-) -> AxumResult<Json<Vec<OrganizationResponse>>> {
-    let organizations = state.store.organization.get_all(user_id.0).await?;
-
-    if query.user_details {
-        let mut populated = Vec::new();
-        for org in organizations {
-            let pop = org.populate_users(state.clone()).await?;
-            populated.push(OrganizationResponse::Populated(pop));
-        }
-        Ok(Json(populated))
-    } else {
-        let basic: Vec<OrganizationResponse> = organizations
-            .into_iter()
-            .map(|org| OrganizationResponse::Basic(org))
-            .collect();
-        Ok(Json(basic))
-    }
+) -> AxumResult<Json<Vec<organization::Model>>> {
+    // if query.user_details {
+    //     let mut populated = Vec::new();
+    //     for org in organizations {
+    //         let pop = org.populate_users(state.clone()).await?;
+    //         populated.push(OrganizationResponse::Populated(pop));
+    //     }
+    //     Ok(Json(populated))
+    // } else {
+    //     let basic: Vec<OrganizationResponse> = organizations
+    //         .into_iter()
+    //         .map(|org| OrganizationResponse::Basic(org))
+    //         .collect();
+    //     Ok(Json(basic))
+    // }
+    //
+    Ok(Json(organizations))
 }

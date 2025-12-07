@@ -16,3 +16,14 @@ services:
       - 6379:6379
     volumes:
       - ./data/valkey:/data
+  sea_orm:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: db
+      POSTGRES_PASSWORD: db
+      POSTGRES_DB: agin-class-manager
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql

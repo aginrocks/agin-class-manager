@@ -1,16 +1,14 @@
-use crate::{axum_error::AxumResult, mongo_id::object_id_as_string_required};
+use crate::{
+    axum_error::AxumResult,
+    models::{organization, user},
+};
 use ::serde::Serialize;
 use axum::{Extension, Json};
-use bson::oid::ObjectId;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 use visible::StructFields;
 
-use crate::{
-    middlewares::require_auth::{UnauthorizedError, UserData},
-    models::{organization::Organization, user::User},
-    state::AppState,
-};
+use crate::{middlewares::require_auth::UnauthorizedError, state::AppState};
 
 pub fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new().routes(routes!(get_user))
@@ -19,14 +17,12 @@ pub fn routes() -> OpenApiRouter<AppState> {
 #[derive(Serialize, ToSchema)]
 #[StructFields(pub)]
 pub struct StrippedOrg {
-    #[serde(rename = "_id", with = "object_id_as_string_required")]
-    #[schema(value_type = String)]
-    id: ObjectId,
+    id: i64,
     name: String,
     avatar_url: Option<String>,
 }
 
-impl Into<StrippedOrg> for &Organization {
+impl Into<StrippedOrg> for &organization::Model {
     fn into(self) -> StrippedOrg {
         StrippedOrg {
             id: self.id,
@@ -39,22 +35,20 @@ impl Into<StrippedOrg> for &Organization {
 #[derive(Serialize, ToSchema, Default)]
 #[StructFields(pub)]
 pub struct GetUserRes {
-    #[serde(rename = "_id", with = "object_id_as_string_required")]
-    #[schema(value_type = String)]
-    id: ObjectId,
+    id: i64,
     subject: String,
     name: String,
     email: String,
     organizations: Vec<StrippedOrg>,
 }
 
-impl Into<GetUserRes> for User {
-    fn into(self) -> GetUserRes {
-        GetUserRes {
-            id: self.id,
-            subject: self.subject,
-            name: self.name,
-            email: self.email,
+impl From<user::Model> for GetUserRes {
+    fn from(user: user::Model) -> Self {
+        Self {
+            id: user.id,
+            subject: user.subject,
+            name: user.name,
+            email: user.email,
             ..Default::default()
         }
     }
@@ -71,13 +65,11 @@ impl Into<GetUserRes> for User {
     tag = "Auth"
 )]
 async fn get_user(
-    Extension(user): Extension<UserData>,
-    Extension(state): Extension<AppState>,
+    Extension(user): Extension<user::Model>,
+    Extension(organizations): Extension<Vec<organization::Model>>,
 ) -> AxumResult<Json<GetUserRes>> {
-    let organizations = state.store.organization.get_all(user.0.id).await?;
-
     Ok(Json(GetUserRes {
         organizations: organizations.iter().map(|m| m.into()).collect(),
-        ..user.0.into()
+        ..user.into()
     }))
 }

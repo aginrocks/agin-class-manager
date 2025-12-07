@@ -6,11 +6,13 @@ use mongodb::{
     bson::{doc, oid::ObjectId},
     options::ReturnDocument,
 };
+use sea_orm::ModelTrait;
 use serde::{Deserialize, Serialize};
 use std::ops::Deref;
 use tower_sessions::Session;
 use utoipa::ToSchema;
 
+use crate::models::organization;
 use crate::{
     axum_error::{AxumError, AxumResult},
     middlewares::GroupClaims,
@@ -63,8 +65,18 @@ pub async fn require_auth(
             .map_err(|_| AxumError::unauthorized(eyre!("Unauthorized")))?
             .ok_or_else(|| AxumError::unauthorized(eyre!("Unauthorized")))?;
 
-        request.extensions_mut().insert(UserData(user.clone()));
-        request.extensions_mut().insert(UserId(user.id));
+        let Some(user) = user else {
+            return Err(AxumError::unauthorized(eyre!("Unauthorized")));
+        };
+
+        let orgs = user
+            .find_related(organization::Entity)
+            .all(&state.sea_orm)
+            .await?;
+
+        request.extensions_mut().insert(user);
+        request.extensions_mut().insert(token);
+        request.extensions_mut().insert(orgs);
 
         return Ok(next.run(request).await);
     }
