@@ -6,7 +6,7 @@ use crate::settings::Settings;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub database: Database,
+    // pub database: Database,
     // pub store: DatabaseStore,
     pub settings: Arc<Settings>,
     pub fred: fred::prelude::Pool,
