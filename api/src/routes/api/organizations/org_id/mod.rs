@@ -8,7 +8,7 @@ use axum::{
     middleware,
 };
 use color_eyre::eyre;
-use sea_orm::{EntityTrait, ModelTrait};
+use sea_orm::{ColumnTrait, EntityTrait, ModelTrait, QueryFilter};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -127,6 +127,11 @@ async fn delete_organization(
     Path(_org_id): Path<i64>,
     Extension(organization): Extension<organization::Model>,
 ) -> AxumResult<Json<Success>> {
+    org_members::Entity::delete_many()
+        .filter(org_members::Column::OrgId.eq(organization.id))
+        .exec(&state.sea_orm)
+        .await?;
+
     organization.delete(&state.sea_orm).await?;
     Ok(Json(Success { success: true }))
 }
