@@ -35,18 +35,18 @@ services:
       traefik.port: 3000
       traefik.http.services.agin-class-web.loadbalancer.server.port: "3000"
       traefik.http.routers.agin-class-web.rule: "Host(`class.agin.rocks`)"
-  mongodb:
-    image: mongodb/mongodb-community-server:7.0-ubi8
-    volumes:
-      - type: bind
-        source: ./data/mongodb
-        target: /data/db
-    ports:
-      - :27017
-    restart: unless-stopped
-    user: 1000:1000
-    networks:
-      - default
+  # mongodb:
+  #   image: mongodb/mongodb-community-server:7.0-ubi8
+  #   volumes:
+  #     - type: bind
+  #       source: ./data/mongodb
+  #       target: /data/db
+  #   ports:
+  #     - :27017
+  #   restart: unless-stopped
+  #   user: 1000:1000
+  #   networks:
+  #     - default
   valkey:
     image: valkey/valkey:latest
     restart: unless-stopped
