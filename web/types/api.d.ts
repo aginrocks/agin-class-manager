@@ -97,41 +97,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/organizations/{org_id}/fundraising": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all fundraisings for an organization */
-        get: operations["get_fundraisings"];
-        put?: never;
-        /** Create a new fundraising */
-        post: operations["create_fundraising"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/organizations/{org_id}/members/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Add member to organization */
-        post: operations["add_member_to_organization"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/organizations/{org_id}/santa": {
         parameters: {
             query?: never;
@@ -179,44 +144,28 @@ export interface components {
             id: string;
             success: boolean;
         };
-        Fundraising: {
-            _id: string;
-            description: string;
-            /** Format: date-time */
-            end_date?: string | null;
-            name: string;
-            organization_id: string;
-            payers: components["schemas"]["Payer"][];
-            /** Format: date-time */
-            start_date?: string | null;
-            /** Format: int64 */
-            total_amount: number;
-        };
-        GenericError: {
-            error: string;
-        };
         GetUserRes: {
-            _id: string;
             email: string;
+            /** Format: int64 */
+            id: number;
             name: string;
             organizations: components["schemas"]["StrippedOrg"][];
             subject: string;
         };
         Membership: {
             role: components["schemas"]["OrganizationRole"];
-            user_id: string;
-        };
-        /** @description MutableFundraising is used for creating or updating fundraising throught the API. */
-        MutableFundraising: {
-            description: string;
-            /** Format: date-time */
-            end_date?: string | null;
-            name: string;
-            payers: components["schemas"]["Payer"][];
-            /** Format: date-time */
-            start_date?: string | null;
             /** Format: int64 */
-            total_amount: number;
+            user_id: number;
+        };
+        Model: {
+            avatar_url?: string | null;
+            /** Format: int64 */
+            budget: number;
+            description: string;
+            /** Format: int64 */
+            id: number;
+            name: string;
+            slug: string;
         };
         /** @description MutableOrganization is used for creating or updating organization throught the API. */
         MutableOrganization: {
@@ -228,61 +177,51 @@ export interface components {
         MutableSanta: {
             /** Format: date-time */
             end_date?: string | null;
-            participants: components["schemas"]["SantaParticipant"][];
+            participants: number[];
             /** Format: date-time */
             propositions_due?: string | null;
             /** Format: date-time */
             start_date?: string | null;
         };
-        /** @example {
-         *       "error": "Not Found"
-         *     } */
-        NotFoundError: {
-            error: string;
-        };
         OrgUser: {
             email: string;
-            id: string;
+            /** Format: int64 */
+            id: number;
             name: string;
             role: components["schemas"]["OrganizationRole"];
         };
-        Organization: {
-            _id: string;
+        OrganizationRes: {
             avatar_url?: string | null;
             /** Format: int64 */
             budget: number;
             description: string;
+            /** Format: int64 */
+            id: number;
             members: components["schemas"]["Membership"][];
             name: string;
             slug: string;
         };
-        OrganizationResponse: components["schemas"]["Organization"] | components["schemas"]["PopulatedOrganization"];
+        OrganizationResponse: components["schemas"]["Model"] | components["schemas"]["PopulatedOrganization"];
         /** @enum {string} */
         OrganizationRole: "member" | "admin";
-        PatchMemberPayload: {
-            role: components["schemas"]["OrganizationRole"];
-            user_id: string;
-        };
-        Payer: {
-            /** Format: int64 */
-            paid_amount: number;
-            user_id: string;
-        };
         PopulatedOrganization: {
-            _id: string;
             avatar_url?: string | null;
             /** Format: int64 */
             budget: number;
             description: string;
+            /** Format: int64 */
+            id: number;
             members: components["schemas"]["OrgUser"][];
             name: string;
             slug: string;
         };
         PopulatedSanta: {
-            _id: string;
             /** Format: date-time */
             end_date: string;
-            organization_id: string;
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            organization_id: number;
             participants: components["schemas"]["SantaParticipant"][];
             /** Format: date-time */
             propositions_due?: string | null;
@@ -290,13 +229,18 @@ export interface components {
             start_date: string;
         };
         SantaParticipant: {
-            present_reciever: string;
-            proposition: string;
-            user_id: string;
+            email: string;
+            /** Format: int64 */
+            id: number;
+            name: string;
+            proposition?: string | null;
+            /** Format: int64 */
+            receiver?: number | null;
         };
         StrippedOrg: {
-            _id: string;
             avatar_url?: string | null;
+            /** Format: int64 */
+            id: number;
             name: string;
         };
         /** @example {
@@ -411,7 +355,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Organization"];
+                    "application/json": components["schemas"]["OrganizationRes"];
                 };
             };
             /** @description Unauthorized */
@@ -434,7 +378,7 @@ export interface operations {
             header?: never;
             path: {
                 /** @description Organization id */
-                org_id: string;
+                org_id: number;
             };
             cookie?: never;
         };
@@ -488,122 +432,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UnauthorizedError"];
-                };
-            };
-        };
-    };
-    get_fundraisings: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Fundraising"][];
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedError"];
-                };
-            };
-        };
-    };
-    create_fundraising: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MutableFundraising"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CreateSuccess"];
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedError"];
-                };
-            };
-        };
-    };
-    add_member_to_organization: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Organization id */
-                org_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PatchMemberPayload"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": string;
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedError"];
-                };
-            };
-            /** @description Forbidden */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GenericError"];
-                };
-            };
-            /** @description Organization not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["NotFoundError"];
                 };
             };
         };

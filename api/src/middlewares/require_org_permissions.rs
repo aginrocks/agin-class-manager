@@ -47,9 +47,7 @@ pub async fn require_org_membership(
 
     let org = organizations.iter().find(|org| org.id == org_id);
 
-    let org = if let Some(org) = org {
-        org
-    } else {
+    let Some(org) = org else {
         return Err(AxumError::not_found(eyre!("Organization not found")));
     };
 
@@ -60,18 +58,19 @@ pub async fn require_org_membership(
         .one(&state.sea_orm)
         .await?;
 
-    let Some((member, Some(org_members::Model { role, .. }))) = member else {
+    let Some((models::user::Model { id: user_id, .. }, Some(org_members::Model { role, .. }))) =
+        member
+    else {
         return Err(AxumError::forbidden(eyre!(
             "You are not a member of this organization"
         )));
     };
 
-    let membership = Membership {
-        role: role,
-        user_id: member.id,
-    };
+    request
+        .extensions_mut()
+        .insert(Membership { role, user_id });
 
-    request.extensions_mut().insert(membership);
+    request.extensions_mut().insert(org.clone());
 
     Ok(next.run(request).await)
 }

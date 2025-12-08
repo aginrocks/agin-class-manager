@@ -1,15 +1,18 @@
-use axum::{Extension, Json, extract::State, middleware};
+use axum::{Extension, Json, body::Body, extract::State, middleware, response::IntoResponse};
 use axum_valid::Valid;
-use color_eyre::eyre::eyre;
+use color_eyre::eyre::{self, eyre};
+use sea_orm::{ActiveValue::Set, EntityTrait, ModelTrait, Related};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     axum_error::{AxumError, AxumResult},
-    middlewares::{
-        require_auth::UnauthorizedError,
-        require_org_permissions::{OrganizationData, requre_org_admin},
+    middlewares::{require_auth::UnauthorizedError, require_org_permissions::requre_org_admin},
+    models::{
+        organization,
+        santa::{self, MutableSanta, PopulatedSanta},
+        santa_participants::{self, SantaParticipant},
+        user,
     },
-    models::santa::{MutableSanta, PartialSanta, PartialSantaParticipant, PopulatedSanta},
     routes::api::CreateSuccess,
     state::AppState,
 };
@@ -38,52 +41,70 @@ pub fn routes() -> OpenApiRouter<AppState> {
 #[axum::debug_handler]
 async fn create_secret_santa(
     State(state): State<AppState>,
-    Extension(org_data): Extension<OrganizationData>,
+    Extension(org_data): Extension<organization::Model>,
     Valid(body): Valid<Json<MutableSanta>>,
 ) -> AxumResult<Json<CreateSuccess>> {
+    let santa_model = santa::ActiveModel {
+        start_date: Set(body.start_date.unwrap_or_else(|| chrono::Utc::now())),
+        organization_id: Set(org_data.id),
+        propositions_due: Set(body.propositions_due),
+        end_date: Set(body.end_date.unwrap_or_else(|| {
+            chrono::Utc::now()
+                .checked_add_months(chrono::Months::new(1))
+                .ok_or_else(|| eyre!("Can't set end_date"))
+                .unwrap()
+        })),
+        ..Default::default()
+    };
+
+    let santa = santa::Entity::insert(santa_model)
+        .exec_with_returning(&state.sea_orm)
+        .await?;
+
     let mut participants = vec![];
     for participant in &body.participants {
         if !org_data
-            .0
-            .members
+            .find_related(user::Entity)
+            .all(&state.sea_orm)
+            .await?
             .iter()
-            .any(|member| member.user_id == participant.user_id)
+            .any(|member| member.id == *participant)
         {
             return Err(AxumError::bad_request(eyre!(
                 "All participants must be in the organization"
             )));
         }
 
-        let oid = state
-            .store
-            .santa_participant
-            .create(PartialSantaParticipant {
-                present_reciever: participant.present_reciever,
-                user_id: participant.user_id,
-                proposition: participant.proposition.clone(),
-            })
-            .await?;
+        let participant_model = santa_participants::ActiveModel {
+            user_id: Set(*participant),
+            santa_id: Set(santa.id),
+            ..Default::default()
+        };
 
-        participants.push(oid.id);
+        participants.push(participant_model);
     }
 
-    let santa = state
-        .store
-        .santa
-        .create(PartialSanta {
-            organization_id: org_data.0.id,
-            participants,
-            propositions_due: body.propositions_due.map(|d| d.into()),
-            start_date: body
-                .start_date
-                .map(|dt| dt.into())
-                .unwrap_or_else(|| chrono::Utc::now().into()),
-            end_date: body
-                .end_date
-                .map(|dt| dt.into())
-                .unwrap_or_else(|| chrono::Utc::now().into()),
-        })
+    santa_participants::Entity::insert_many(participants)
+        .exec(&state.sea_orm)
         .await?;
+
+    // let santa = state
+    //     .store
+    //     .santa
+    //     .create(PartialSanta {
+    //         organization_id: org_data.0.id,
+    //         participants,
+    //         propositions_due: body.propositions_due.map(|d| d.into()),
+    //         start_date: body
+    //             .start_date
+    //             .map(|dt| dt.into())
+    //             .unwrap_or_else(|| chrono::Utc::now().into()),
+    //         end_date: body
+    //             .end_date
+    //             .map(|dt| dt.into())
+    //             .unwrap_or_else(|| chrono::Utc::now().into()),
+    //     })
+    //     .await?;
 
     Ok(Json(CreateSuccess {
         success: true,
@@ -103,15 +124,42 @@ async fn create_secret_santa(
 )]
 async fn get_secret_santa(
     Extension(state): Extension<AppState>,
-    Extension(org_data): Extension<OrganizationData>,
+    Extension(org_data): Extension<organization::Model>,
 ) -> AxumResult<Json<PopulatedSanta>> {
-    let santa = state
-        .store
-        .santa
-        .get_by_organization(&org_data.0.id)
+    let Some(santa) = santa::Entity::find_by_organization_id(org_data.id)
+        .one(&state.sea_orm)
         .await?
-        .populate_participants(state)
+    else {
+        return Err(AxumError::not_found(eyre!(
+            "No secret santa event found for this organization"
+        )));
+    };
+
+    let santa_participants = santa
+        .find_related(user::Entity)
+        .select_also(santa_participants::Entity)
+        .all(&state.sea_orm)
         .await?;
 
-    Ok(Json(santa))
+    let participants: Vec<SantaParticipant> = santa_participants
+        .into_iter()
+        .filter_map(|(user, participant)| {
+            Some(SantaParticipant {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                receiver: participant.clone()?.receiver_id,
+                proposition: participant?.proposition,
+            })
+        })
+        .collect();
+
+    Ok(Json(PopulatedSanta {
+        id: santa.id,
+        end_date: santa.end_date,
+        organization_id: santa.organization_id,
+        start_date: santa.start_date,
+        propositions_due: santa.propositions_due,
+        participants,
+    }))
 }

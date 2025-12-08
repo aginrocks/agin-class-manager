@@ -1,14 +1,7 @@
 use sea_orm::entity::prelude::*;
 
-use crate::database_object;
-use crate::mongo_id::object_id_as_string_required;
-
-use mongodb::bson::oid::ObjectId;
-use partial_struct::Partial;
 use sea_orm::ActiveModelBehavior;
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
-use visible::StructFields;
+use serde::Serialize;
 
 // database_object!(Membership {
 //     #[schema(value_type = String)]

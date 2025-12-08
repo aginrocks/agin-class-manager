@@ -15,6 +15,7 @@ import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDialogs } from "@/lib/dialogs";
 import { DatePicker } from "../date-picker";
 import CheckboxTile from "../checkbox-tile";
+import { components } from "@/types/api";
 
 export default function CreateSantaDialog({
   ...props
@@ -23,13 +24,21 @@ export default function CreateSantaDialog({
   const queryClient = useQueryClient();
   const dialogs = useDialogs();
 
-  const org = useAtomValue(SelectedOrgAtom);
+  const org = useAtomValue(SelectedOrgAtom) as {
+    avatar_url?: string | null;
+    budget: number;
+    description: string;
+    id: number;
+    members: components["schemas"]["OrgUser"][];
+    name: string;
+    slug: string;
+  };
 
   const santamut = $api.useMutation(
     "post",
     "/api/organizations/{org_id}/santa",
   );
-  const [selectedMembers, setSelectedMembers] = useState<Set<string>>(
+  const [selectedMembers, setSelectedMembers] = useState<Set<number>>(
     new Set(),
   );
 
@@ -51,7 +60,7 @@ export default function CreateSantaDialog({
   const [propositionsDue, setPropositionsDue] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
 
-  const handleMemberToggle = (memberId: string, checked: boolean) => {
+  const handleMemberToggle = (memberId: number, checked: boolean) => {
     setSelectedMembers((prev) => {
       const newSet = new Set(prev);
       if (checked) {
@@ -70,8 +79,6 @@ export default function CreateSantaDialog({
 
     const participants = Array.from(selectedMembers).map((memberId) => ({
       user_id: memberId,
-      present_reciever: memberId,
-      proposition: "",
     }));
 
     try {
@@ -79,12 +86,12 @@ export default function CreateSantaDialog({
         params: {
           //@ts-expect-error undefined type for some reason
           path: {
-            org_id: org._id,
+            org_id: org.id,
           },
         },
         body: {
           start_date: startDate.toISOString(),
-          participants,
+          participants: Array.from(selectedMembers),
           end_date: endDate.toISOString(),
           propositions_due: propositionsDue.toISOString(),
         },

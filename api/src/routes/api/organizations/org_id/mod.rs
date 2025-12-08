@@ -1,5 +1,5 @@
-mod fundraising;
-mod members;
+// mod fundraising;
+// mod members;
 mod santa;
 
 use axum::{
@@ -38,8 +38,8 @@ pub fn routes() -> OpenApiRouter<AppState> {
 
     let user = OpenApiRouter::new()
         .routes(routes!(get_organization_by_id))
-        .nest("/members", members::routes())
-        .nest("/fundraising", fundraising::routes())
+        // .nest("/members", members::routes())
+        // .nest("/fundraising", fundraising::routes())
         .nest("/santa", santa::routes())
         .layer(middleware::from_fn(require_org_membership));
 
@@ -126,8 +126,8 @@ async fn get_organization_by_id(
 async fn delete_organization(
     Extension(state): Extension<AppState>,
     Path(org_id): Path<ObjectId>,
+    Extension(organization): Extension<organization::Model>,
 ) -> AxumResult<Json<Success>> {
-    state.store.organization.delete(org_id).await?;
-
+    organization.delete(&state.sea_orm).await?;
     Ok(Json(Success { success: true }))
 }
