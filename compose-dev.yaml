@@ -16,7 +16,7 @@ services:
       - 6379:6379
     volumes:
       - ./data/valkey:/data
-  sea_orm:
+  postgress:
     image: postgres:18
     restart: unless-stopped
     environment:

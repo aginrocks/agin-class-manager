@@ -7,7 +7,7 @@ services:
         PROJECT_NAME: api
         BUILDPLATFORM: linux/amd64
     depends_on:
-      - mongodb
+      - postgress
       - valkey
     volumes:
       - ./config.toml:/config.toml:rw
@@ -54,6 +54,17 @@ services:
       - :6379
     volumes:
       - ./data/valkey:/data
+    networks:
+      - default
+  postgress:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: db
+      POSTGRES_PASSWORD: db
+      POSTGRES_DB: agin-class-manager
+    volumes:
+      - ./data/postgres:/var/lib/postgresql
     networks:
       - default
 networks:
