@@ -32,7 +32,7 @@ pub struct PatchMemberPayload {
     method(post),
     path = "/",
     params(
-        ("org_id" = String, Path, description = "Organization id"),
+        ("org_id" = i64, Path, description = "Organization id"),
     ),
     responses(
         (status = OK, description = "Success", body = String, content_type = "application/json"),

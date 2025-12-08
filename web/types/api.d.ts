@@ -97,6 +97,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/organizations/{org_id}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add member to organization */
+        post: operations["add_member_to_organization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/organizations/{org_id}/santa": {
         parameters: {
             query?: never;
@@ -144,6 +161,9 @@ export interface components {
             id: string;
             success: boolean;
         };
+        GenericError: {
+            error: string;
+        };
         GetUserRes: {
             email: string;
             /** Format: int64 */
@@ -183,6 +203,12 @@ export interface components {
             /** Format: date-time */
             start_date?: string | null;
         };
+        /** @example {
+         *       "error": "Not Found"
+         *     } */
+        NotFoundError: {
+            error: string;
+        };
         OrgUser: {
             email: string;
             /** Format: int64 */
@@ -204,6 +230,10 @@ export interface components {
         OrganizationResponse: components["schemas"]["Model"] | components["schemas"]["PopulatedOrganization"];
         /** @enum {string} */
         OrganizationRole: "member" | "admin";
+        PatchMemberPayload: {
+            email: string;
+            role: components["schemas"]["OrganizationRole"];
+        };
         PopulatedOrganization: {
             avatar_url?: string | null;
             /** Format: int64 */
@@ -410,7 +440,7 @@ export interface operations {
             header?: never;
             path: {
                 /** @description Organization id */
-                org_id: string;
+                org_id: number;
             };
             cookie?: never;
         };
@@ -432,6 +462,60 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+        };
+    };
+    add_member_to_organization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization id */
+                org_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchMemberPayload"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericError"];
+                };
+            };
+            /** @description Organization not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotFoundError"];
                 };
             };
         };

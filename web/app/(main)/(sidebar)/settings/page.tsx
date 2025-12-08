@@ -17,7 +17,7 @@ export default function SettingsPage() {
   const deleteOrg = $api.useMutation("delete", "/api/organizations/{org_id}");
 
   async function handleDelete() {
-    if (!org?._id) {
+    if (!org?.id) {
       return;
     }
 
@@ -31,7 +31,7 @@ export default function SettingsPage() {
       await deleteOrg
         .mutateAsync({
           params: {
-            path: { org_id: org._id },
+            path: { org_id: org.id },
           },
         })
         .then(

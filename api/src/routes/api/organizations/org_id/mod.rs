@@ -115,7 +115,7 @@ async fn get_organization_by_id(
     method(delete),
     path = "/",
     params(
-        ("org_id" = String, Path, description = "Organization id"),
+        ("org_id" = i64, Path, description = "Organization id"),
     ),
     responses(
         (status = OK, description = "Success", body = Success, content_type = "application/json"),
