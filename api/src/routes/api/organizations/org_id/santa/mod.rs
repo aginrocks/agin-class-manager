@@ -90,7 +90,7 @@ async fn create_secret_santa(
 
     Ok(Json(CreateSuccess {
         success: true,
-        id: santa.id.to_string(),
+        id: santa.id,
     }))
 }
 

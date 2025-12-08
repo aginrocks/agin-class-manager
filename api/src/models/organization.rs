@@ -1,5 +1,6 @@
 use crate::models::org_members::{Membership, OrganizationRole};
 
+use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
@@ -52,8 +53,6 @@ pub struct OrganizationRes {
     avatar_url: Option<String>,
     budget: i64,
 }
-
-use sea_orm::entity::prelude::*;
 
 #[sea_orm::model]
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, ToSchema)]
