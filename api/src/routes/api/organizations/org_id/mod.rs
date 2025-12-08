@@ -1,5 +1,5 @@
 // mod fundraising;
-// mod members;
+mod members;
 mod santa;
 
 use axum::{
@@ -38,7 +38,7 @@ pub fn routes() -> OpenApiRouter<AppState> {
 
     let user = OpenApiRouter::new()
         .routes(routes!(get_organization_by_id))
-        // .nest("/members", members::routes())
+        .nest("/members", members::routes())
         // .nest("/fundraising", fundraising::routes())
         .nest("/santa", santa::routes())
         .layer(middleware::from_fn(require_org_membership));

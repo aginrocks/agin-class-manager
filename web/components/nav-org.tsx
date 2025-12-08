@@ -51,7 +51,7 @@ export function NavOrganization() {
             <DropdownMenuGroup>
               {organizations?.map((org) => (
                 <DropdownMenuItem
-                  key={org._id}
+                  key={org.id}
                   onClick={() => handleSelectOrg(org)}>
                   <OrgOption
                     size="small"
