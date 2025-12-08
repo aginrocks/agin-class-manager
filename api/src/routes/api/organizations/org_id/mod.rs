@@ -125,7 +125,7 @@ async fn get_organization_by_id(
 )]
 async fn delete_organization(
     Extension(state): Extension<AppState>,
-    Path(org_id): Path<ObjectId>,
+    Path(_org_id): Path<ObjectId>,
     Extension(organization): Extension<organization::Model>,
 ) -> AxumResult<Json<Success>> {
     organization.delete(&state.sea_orm).await?;

@@ -1,7 +1,6 @@
 use axum::{Extension, Json};
 use color_eyre::eyre::eyre;
-use mongodb::bson::oid::ObjectId;
-use sea_orm::{ActiveValue::Set, EntityTrait, ModelTrait};
+use sea_orm::{ActiveValue::Set, ColumnTrait, EntityTrait, ModelTrait, QueryFilter};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -14,7 +13,6 @@ use crate::{
         org_members::{self, OrganizationRole},
         organization, user,
     },
-    mongo_id::object_id_as_string_required,
     routes::api::{GenericError, NotFoundError},
     state::AppState,
 };
@@ -25,7 +23,7 @@ pub fn routes() -> OpenApiRouter<AppState> {
 
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Validate)]
 pub struct PatchMemberPayload {
-    pub user_id: i64,
+    pub email: String,
     pub role: OrganizationRole,
 }
 
@@ -56,15 +54,23 @@ async fn add_member_to_organization(
         .all(&state.sea_orm)
         .await?
         .iter()
-        .any(|m| m.id == payload.user_id)
+        .any(|m| m.email == payload.email)
     {
         return Err(AxumError::bad_request(eyre!(
             "User is already a member of this organization"
         )));
     }
 
+    let Some(user) = user::Entity::find()
+        .filter(user::Column::Email.eq(payload.email))
+        .one(&state.sea_orm)
+        .await?
+    else {
+        return Err(AxumError::bad_request(eyre!("User does not exist")));
+    };
+
     let members = org_members::ActiveModel {
-        user_id: Set(payload.user_id),
+        user_id: Set(user.id),
         org_id: Set(org_data.id.clone()),
         role: Set(payload.role),
     };

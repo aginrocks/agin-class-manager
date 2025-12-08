@@ -1,7 +1,7 @@
-use axum::{Extension, Json, body::Body, extract::State, middleware, response::IntoResponse};
+use axum::{Extension, Json, extract::State, middleware};
 use axum_valid::Valid;
-use color_eyre::eyre::{self, eyre};
-use sea_orm::{ActiveValue::Set, EntityTrait, ModelTrait, Related};
+use color_eyre::eyre::eyre;
+use sea_orm::{ActiveValue::Set, EntityTrait, ModelTrait};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -87,24 +87,6 @@ async fn create_secret_santa(
     santa_participants::Entity::insert_many(participants)
         .exec(&state.sea_orm)
         .await?;
-
-    // let santa = state
-    //     .store
-    //     .santa
-    //     .create(PartialSanta {
-    //         organization_id: org_data.0.id,
-    //         participants,
-    //         propositions_due: body.propositions_due.map(|d| d.into()),
-    //         start_date: body
-    //             .start_date
-    //             .map(|dt| dt.into())
-    //             .unwrap_or_else(|| chrono::Utc::now().into()),
-    //         end_date: body
-    //             .end_date
-    //             .map(|dt| dt.into())
-    //             .unwrap_or_else(|| chrono::Utc::now().into()),
-    //     })
-    //     .await?;
 
     Ok(Json(CreateSuccess {
         success: true,

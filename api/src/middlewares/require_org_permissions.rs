@@ -5,10 +5,8 @@ use axum::{
     response::Response,
 };
 use color_eyre::eyre::eyre;
-use mongodb::bson::{doc, oid::ObjectId};
 use sea_orm::{ColumnTrait, ModelTrait, QueryFilter};
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
+use serde::Deserialize;
 
 use crate::{
     axum_error::{AxumError, AxumResult},
@@ -33,18 +31,6 @@ pub async fn require_org_membership(
     mut request: Request,
     next: Next,
 ) -> AxumResult<Response> {
-    // let org_data = state
-    //     .store
-    //     .organization
-    //     .get_by_id(org_id)
-    //     .await?
-    //     .ok_or_else(|| AxumError::not_found(eyre!("Organization not found")))?;
-
-    // let is_member = org_data
-    //     .members
-    //     .iter()
-    //     .find(|m| m.user_id == user_data.0.id);
-
     let org = organizations.iter().find(|org| org.id == org_id);
 
     let Some(org) = org else {

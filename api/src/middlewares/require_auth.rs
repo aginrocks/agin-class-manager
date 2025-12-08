@@ -2,15 +2,10 @@ use axum::{Extension, extract::Request, middleware::Next, response::Response};
 use axum_oidc::OidcClaims;
 use color_eyre::eyre::eyre;
 use color_eyre::eyre::{self, ContextCompat};
-use mongodb::{
-    bson::{doc, oid::ObjectId},
-    options::ReturnDocument,
-};
-use sea_orm::ActiveValue::{NotSet, Set};
+use sea_orm::ActiveValue::Set;
 use sea_orm::sea_query::OnConflict;
-use sea_orm::{ActiveModelTrait, EntityTrait, ModelTrait};
-use serde::{Deserialize, Serialize};
-use std::ops::Deref;
+use sea_orm::{EntityTrait, ModelTrait};
+use serde::Serialize;
 use tower_sessions::Session;
 use utoipa::ToSchema;
 
@@ -19,26 +14,12 @@ use crate::{
     axum_error::{AxumError, AxumResult},
     middlewares::GroupClaims,
     models::{
-        token::{self, AccessToken},
+        token::{self},
         user::{self},
     },
     state::AppState,
     utils::hash_pat,
 };
-
-// #[derive(Clone, Debug, Serialize, ToSchema, Deserialize)]
-// pub struct UserData(pub User);
-
-// #[derive(Clone, Debug, Serialize, Deserialize)]
-// pub struct UserId(pub ObjectId);
-
-// impl Deref for UserId {
-//     type Target = ObjectId;
-
-//     fn deref(&self) -> &Self::Target {
-//         &self.0
-//     }
-// }
 
 /// Middleware that ensures the user is authenticated
 pub async fn require_auth(

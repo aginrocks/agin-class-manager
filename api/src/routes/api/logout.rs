@@ -4,8 +4,6 @@ use axum::{
     http::{HeaderMap, header::SET_COOKIE},
     response::{IntoResponse, Redirect, Response},
 };
-use color_eyre::eyre::eyre;
-use sea_orm::ModelTrait;
 use tower_sessions::Session;
 use tracing::{error, info};
 use utoipa_axum::{router::OpenApiRouter, routes};
