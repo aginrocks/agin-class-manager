@@ -2,10 +2,8 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Spinner } from "@/components/ui/spinner";
-import { UserAtom } from "@/lib/atoms/user";
 import { $api } from "@/lib/providers/api";
 import { useQuery } from "@tanstack/react-query";
-import { useAtomValue } from "jotai";
 import { useRouter } from "next/navigation";
 import { CSSProperties, ReactNode, useEffect } from "react";
 

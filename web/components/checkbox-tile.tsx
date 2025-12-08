@@ -1,4 +1,4 @@
-import { FormEventHandler, HTMLAttributes } from "react";
+import { HTMLAttributes } from "react";
 import { Checkbox } from "./ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
 

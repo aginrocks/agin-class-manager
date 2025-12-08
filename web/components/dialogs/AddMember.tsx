@@ -40,7 +40,7 @@ export default function AddMemberDialog({
         params: { path: { org_id: props.payload.org_id } },
       })
       .then(
-        (_res) => {
+        () => {
           dialogs.hide("AddMember");
           queryClient.invalidateQueries({
             queryKey: $api.queryOptions("get", "/api/organizations/{org_id}", {

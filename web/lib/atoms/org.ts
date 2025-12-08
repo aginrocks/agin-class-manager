@@ -1,7 +1,7 @@
 "use client";
 import { components, paths } from "@/types/api";
 import { useQuery } from "@tanstack/react-query";
-import { atom, useAtom, useSetAtom } from "jotai";
+import { atom, useAtom } from "jotai";
 import { $api } from "../providers/api";
 import { useEffect } from "react";
 

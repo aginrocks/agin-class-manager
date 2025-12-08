@@ -18,8 +18,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAvatar } from "@/lib/hooks/use-avatar";
-import { useAtomValue } from "jotai";
-import { UserAtom } from "@/lib/atoms/user";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { $api } from "@/lib/providers/api";
@@ -28,9 +26,7 @@ export function NavUser() {
   const { isMobile } = useSidebar();
   const router = useRouter();
 
-  const { data: userData, isFetched } = useQuery(
-    $api.queryOptions("get", "/api/user"),
-  );
+  const { data: userData } = useQuery($api.queryOptions("get", "/api/user"));
   const avatar = useAvatar(userData?.email);
 
   const avatarFallbackText = userData?.name?.charAt(0)?.toUpperCase() ?? "";

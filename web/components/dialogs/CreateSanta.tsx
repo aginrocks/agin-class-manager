@@ -6,11 +6,9 @@ import { $api } from "@/lib/providers/api";
 import { Label } from "../ui/label";
 import InputWrapper from "../input-wrapper";
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
 import { SelectedOrgAtom, TOrgUSer } from "@/lib/atoms/org";
 import { useAtomValue } from "jotai";
 import { useQueryClient } from "@tanstack/react-query";
-import { useDialogs } from "@/lib/dialogs";
 import { DatePicker } from "../date-picker";
 import CheckboxTile from "../checkbox-tile";
 import { components } from "@/types/api";
@@ -18,9 +16,7 @@ import { components } from "@/types/api";
 export default function CreateSantaDialog({
   ...props
 }: ComponentProps<typeof DialogPrimitive.Root> & DialogProps<"CreateSanta">) {
-  const router = useRouter();
   const queryClient = useQueryClient();
-  const dialogs = useDialogs();
 
   const org = useAtomValue(SelectedOrgAtom) as {
     avatar_url?: string | null;
@@ -74,10 +70,6 @@ export default function CreateSantaDialog({
     if (!startDate || !propositionsDue || !endDate || !org) {
       return;
     }
-
-    const participants = Array.from(selectedMembers).map((memberId) => ({
-      user_id: memberId,
-    }));
 
     try {
       await santamut.mutateAsync({
