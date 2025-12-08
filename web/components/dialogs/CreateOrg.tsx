@@ -34,13 +34,13 @@ export default function CreateOrgDialog({
       (res) => {
         setSelectedOrg(res);
         dialogs.hide("CreateOrg");
-        router.push("/dashboard");
         queryClient.invalidateQueries({
           queryKey: $api.queryOptions("get", "/api/user").queryKey,
         });
         queryClient.invalidateQueries({
           queryKey: $api.queryOptions("get", "/api/organizations").queryKey,
         });
+        router.push("/dashboard");
       },
       (e) => {
         alert(`Something went wrong: ${e.error}`);
