@@ -8,7 +8,6 @@ use axum::{
     middleware,
 };
 use color_eyre::eyre;
-use mongodb::bson::oid::ObjectId;
 use sea_orm::{EntityTrait, ModelTrait};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -125,7 +124,7 @@ async fn get_organization_by_id(
 )]
 async fn delete_organization(
     Extension(state): Extension<AppState>,
-    Path(_org_id): Path<ObjectId>,
+    Path(_org_id): Path<i64>,
     Extension(organization): Extension<organization::Model>,
 ) -> AxumResult<Json<Success>> {
     organization.delete(&state.sea_orm).await?;
