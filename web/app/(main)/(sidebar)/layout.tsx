@@ -19,7 +19,7 @@ export default function Layout({
   );
 
   useEffect(() => {
-    if (!user) {
+    if (!user || isLoading) {
       return;
     }
 

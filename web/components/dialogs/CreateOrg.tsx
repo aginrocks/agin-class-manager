@@ -40,6 +40,7 @@ export default function CreateOrgDialog({
         queryClient.invalidateQueries({
           queryKey: $api.queryOptions("get", "/api/organizations").queryKey,
         });
+        setTimeout(() => {}, 1000);
         router.push("/dashboard");
       },
       (e) => {
