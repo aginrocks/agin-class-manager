@@ -2,13 +2,11 @@
 import { DataTable } from "@/components/data-table";
 import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
-
 import { useAtomValue } from "jotai";
 import { SelectedOrgAtom } from "@/lib/atoms/org";
 import { useQuery } from "@tanstack/react-query";
 import { $api } from "@/lib/providers/api";
 import { useMemo } from "react";
-import { UserAtom } from "@/lib/atoms/user";
 
 export default function Page() {
   const org = useAtomValue(SelectedOrgAtom);
@@ -21,11 +19,11 @@ export default function Page() {
       {
         params: {
           //@ts-expect-error when org._id is null then it's not even enabled and it shouldn't be a problem
-          path: { org_id: org?._id },
+          path: { org_id: org?.id },
         },
       },
       {
-        enabled: !!org?._id,
+        enabled: !!org?.id,
       },
     ),
   );
@@ -37,27 +35,30 @@ export default function Page() {
       {
         params: {
           //@ts-expect-error when org._id is null then it's not even enabled and it shouldn't be a problem
-          path: { org_id: org?._id },
+          path: { org_id: org?.id },
+          query: { "user-details": true },
         },
       },
       {
-        enabled: !!org?._id,
+        enabled: !!org?.id,
       },
     ),
   );
 
   const totalDue = useMemo(() => {
-    if (!fundrisings) return 0;
+    if (!fundrisings || !organization) return 0;
+    const memberCount =
+      "members" in organization ? organization.members.length : 1;
     return (
       fundrisings.reduce(
         (acc, curr) =>
           acc +
           curr.total_amount -
-          (curr.payers.find((u) => u.user_id == user?._id)?.paid_amount || 0),
+          (curr.payers.find((u) => u.user_id == user?.id)?.paid_amount || 0),
         0,
-      ) / (organization?.members.length || 1)
+      ) / memberCount
     );
-  }, [fundrisings, organization?.members]);
+  }, [fundrisings, organization, user?.id]);
 
   return (
     <>

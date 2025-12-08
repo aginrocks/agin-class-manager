@@ -97,6 +97,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/organizations/{org_id}/fundraising": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all fundraisings for an organization */
+        get: operations["get_fundraisings"];
+        put?: never;
+        /** Create a new fundraising */
+        post: operations["create_fundraising"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/organizations/{org_id}/members": {
         parameters: {
             query?: never;
@@ -158,8 +176,24 @@ export interface components {
          *       "id": "60c72b2f9b1d8c001c8e4f5a"
          *     } */
         CreateSuccess: {
-            id: string;
+            /** Format: int64 */
+            id: number;
             success: boolean;
+        };
+        FundraisingRes: {
+            description: string;
+            /** Format: date-time */
+            end_date?: string | null;
+            /** Format: int64 */
+            id: number;
+            name: string;
+            /** Format: int64 */
+            organization_id: number;
+            payers: components["schemas"]["Payer"][];
+            /** Format: date-time */
+            start_date?: string | null;
+            /** Format: int64 */
+            total_amount: number;
         };
         GenericError: {
             error: string;
@@ -186,6 +220,18 @@ export interface components {
             id: number;
             name: string;
             slug: string;
+        };
+        /** @description MutableFundraising is used for creating or updating fundraising throught the API. */
+        MutableFundraising: {
+            description: string;
+            /** Format: date-time */
+            end_date?: string | null;
+            name: string;
+            payers: components["schemas"]["Payer"][];
+            /** Format: date-time */
+            start_date?: string | null;
+            /** Format: int64 */
+            total_amount: number;
         };
         /** @description MutableOrganization is used for creating or updating organization throught the API. */
         MutableOrganization: {
@@ -233,6 +279,12 @@ export interface components {
         PatchMemberPayload: {
             email: string;
             role: components["schemas"]["OrganizationRole"];
+        };
+        Payer: {
+            /** Format: int64 */
+            paid_amount: number;
+            /** Format: int64 */
+            user_id: number;
         };
         PopulatedOrganization: {
             avatar_url?: string | null;
@@ -453,6 +505,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Success"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+        };
+    };
+    get_fundraisings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FundraisingRes"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedError"];
+                };
+            };
+        };
+    };
+    create_fundraising: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MutableFundraising"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateSuccess"];
                 };
             };
             /** @description Unauthorized */

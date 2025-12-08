@@ -290,7 +290,7 @@ function DraggableRow({
   >;
 }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
-    id: row.original._id,
+    id: row.original.id,
   });
 
   return (
@@ -322,7 +322,7 @@ export function DataTable({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState({
@@ -333,7 +333,7 @@ export function DataTable({
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
     useSensor(TouchSensor, {}),
-    useSensor(KeyboardSensor, {})
+    useSensor(KeyboardSensor, {}),
   );
 
   React.useEffect(() => {
@@ -341,8 +341,8 @@ export function DataTable({
   }, [initialData]);
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(
-    () => data?.map(({ _id }) => _id) || [],
-    [data]
+    () => data?.map(({ id }) => id) || [],
+    [data],
   );
 
   const table = useReactTable({
@@ -355,7 +355,7 @@ export function DataTable({
       columnFilters,
       pagination,
     },
-    getRowId: (row) => row._id.toString(),
+    getRowId: (row) => row.id.toString(),
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -430,7 +430,7 @@ export function DataTable({
                 .filter(
                   (column) =>
                     typeof column.accessorFn !== "undefined" &&
-                    column.getCanHide()
+                    column.getCanHide(),
                 )
                 .map((column) => {
                   return (
@@ -474,7 +474,7 @@ export function DataTable({
                             ? null
                             : flexRender(
                                 header.column.columnDef.header,
-                                header.getContext()
+                                header.getContext(),
                               )}
                         </TableHead>
                       );

@@ -39,7 +39,7 @@ pub fn routes() -> OpenApiRouter<AppState> {
     let user = OpenApiRouter::new()
         .routes(routes!(get_organization_by_id))
         .nest("/members", members::routes())
-        // .nest("/fundraising", fundraising::routes())
+        .nest("/fundraising", fundraising::routes())
         .nest("/santa", santa::routes())
         .layer(middleware::from_fn(require_org_membership));
 

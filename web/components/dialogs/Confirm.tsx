@@ -1,7 +1,6 @@
 import { ComponentProps } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { DialogProps } from "@/lib/dialogs/types";
-import BaseDialog from "./Base";
 import {
   AlertDialog,
   AlertDialogAction,

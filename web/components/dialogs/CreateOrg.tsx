@@ -11,7 +11,7 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { SelectedOrgAtom } from "@/lib/atoms/org";
 import { useSetAtom } from "jotai";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useDialogs } from "@/lib/dialogs";
 
 export default function CreateOrgDialog({
