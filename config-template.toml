@@ -14,4 +14,4 @@ client_secret = "client_secret"
 connection_string = "redis://valkey:6379"
 
 [sea_orm]
-connection_string = "postgres://db:db@localhost/agin-class-manager"
+connection_string = "postgres://db:db@postgres/agin-class-manager"
