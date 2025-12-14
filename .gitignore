@@ -4,3 +4,5 @@ data/valkey/*
 !data/valkey/dummyfile
 
 target
+
+config.toml

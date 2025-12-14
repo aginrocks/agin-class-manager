@@ -5,14 +5,13 @@ listen_address = [
 ]
 public_url = "http://localhost:3010/"
 
-[db]
-connection_string = "mongodb://mongodb:27017"
-database_name = "agin-class-manager"
-
 [oidc]
-issuer = "https://example.com"
-client_id = "client_id"
-client_secret = "client_secret"
+issuer = "https://auth.agin.rocks/application/o/agin-class-manager/"
+client_id = "ct6w1iY0kI6vMWUVymQF6tcnui0xlyo3gMwR39fa"
+client_secret = "URF9xDXqiDiFYBRLr2pXUglhX0lMt6NQuuRhgRtL4hcyX4lg5uH7jTzjxgyrm2hS1RriH5wwxQkW6oUuvXlMxBNhGPKLW6NUB966FkVZqqIScU8cUOKVsR2ikSevgDoV"
 
 [redis]
 connection_string = "redis://valkey:6379"
+
+[sea_orm]
+connection_string = "postgres://db:db@localhost/agin-class-manager"
