@@ -9,8 +9,10 @@ use crate::{
     axum_error::AxumResult,
     middlewares::require_auth::UnauthorizedError,
     models::{
-        fundraising::{self, FundraisingRes, Payer},
-        organization, payers, user,
+        fundraising::{self, FundraisingRes},
+        organization,
+        payers::{self, PayerRes},
+        user,
     },
     state::AppState,
 };
@@ -50,12 +52,22 @@ async fn get_fundraisings(
             .all(&state.sea_orm)
             .await?;
 
+        let mut total_amount: i64 = 0;
+
         let payers = users
             .into_iter()
             .filter_map(|(user, payer)| {
-                Some(Payer {
-                    paid_amount: payer?.paid_amount,
+                let Some(payer) = payer.clone() else {
+                    return None;
+                };
+
+                total_amount += payer.amount_to_pay;
+
+                Some(PayerRes {
+                    paid_amount: payer.paid_amount,
                     user_id: user.id,
+                    amount_to_pay: payer.amount_to_pay,
+                    comment: payer.comment,
                 })
             })
             .collect();
@@ -64,7 +76,7 @@ async fn get_fundraisings(
             description: fundraising.description,
             id: fundraising.id,
             name: fundraising.name,
-            total_amount: fundraising.total_amount,
+            total_amount: total_amount,
             start_date: fundraising.start_date,
             end_date: fundraising.end_date,
             organization_id: fundraising.organization_id,

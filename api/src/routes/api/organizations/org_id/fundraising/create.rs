@@ -55,7 +55,6 @@ pub async fn create_fundraising(
     let fundraising_model = fundraising::ActiveModel {
         description: Set(body.description.clone()),
         name: Set(body.name.clone()),
-        total_amount: Set(body.total_amount),
         end_date: Set(body.end_date.map(|d| d.into())),
         start_date: Set(body.start_date.map(|d| d.into())),
         organization_id: Set(org_data.id),

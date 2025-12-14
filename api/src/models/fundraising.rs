@@ -1,25 +1,17 @@
+use crate::models::payers::{Payer, PayerRes};
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
 use visible::StructFields;
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
-pub struct Payer {
-    pub user_id: i64,
-    pub paid_amount: i64,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, FromJsonQueryResult)]
-pub struct PayerVec(pub Vec<Payer>);
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
+#[derive(Clone, Debug, Serialize, ToSchema)]
 #[StructFields(pub)]
 pub struct FundraisingRes {
     id: i64,
     name: String,
     description: String,
-    payers: Vec<Payer>,
+    payers: Vec<PayerRes>,
     total_amount: i64,
     start_date: Option<chrono::DateTime<Utc>>,
     end_date: Option<chrono::DateTime<Utc>>,
@@ -57,8 +49,6 @@ pub struct Model {
 
     #[sea_orm(has_many, via = "payers")]
     payers: HasMany<super::user::Entity>,
-
-    total_amount: i64,
 
     start_date: Option<chrono::DateTime<Utc>>,
 
