@@ -5,7 +5,6 @@ use axum_oidc::{OidcAuthLayer, OidcClient, error::MiddlewareError};
 use color_eyre::{Result, eyre::Ok};
 use fred::prelude::{ClientLike, Config, Pool};
 use http::StatusCode;
-use mongodb::{Client, Database};
 use std::{net::SocketAddr, ops::Deref};
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;

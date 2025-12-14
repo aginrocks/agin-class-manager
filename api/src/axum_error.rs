@@ -13,6 +13,7 @@ pub struct AxumError {
     pub status_code: StatusCode,
 }
 
+#[allow(dead_code)]
 impl AxumError {
     pub fn new(report: Report) -> Self {
         Self {

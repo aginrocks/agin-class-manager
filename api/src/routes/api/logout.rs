@@ -1,5 +1,4 @@
 use axum::{
-    Extension,
     extract::State,
     http::{HeaderMap, header::SET_COOKIE},
     response::{IntoResponse, Redirect, Response},
@@ -8,7 +7,7 @@ use tower_sessions::Session;
 use tracing::{error, info};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::{axum_error::AxumResult, models::token, state::AppState};
+use crate::{axum_error::AxumResult, state::AppState};
 
 pub fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new().routes(routes!(log_out))
@@ -18,11 +17,7 @@ pub fn routes() -> OpenApiRouter<AppState> {
 ///
 /// Clears the user session, removes the OIDC 'id' cookie, and redirects to the OIDC end-session endpoint.
 #[utoipa::path(method(get), path = "/", tag = "Auth")]
-async fn log_out(
-    State(state): State<AppState>,
-    Extension(token): Extension<token::Model>,
-    session: Session,
-) -> AxumResult<Response> {
+async fn log_out(State(state): State<AppState>, session: Session) -> AxumResult<Response> {
     // token
     //     .delete(&state.sea_orm)
     //     .await

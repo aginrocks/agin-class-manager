@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use mongodb::Database;
-
 use crate::settings::Settings;
 
 #[derive(Clone)]

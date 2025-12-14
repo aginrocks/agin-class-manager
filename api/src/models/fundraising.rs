@@ -1,11 +1,6 @@
-use crate::database_object;
-use crate::mongo_id::object_id_as_string_required;
-
 use chrono::Utc;
-use mongodb::bson::oid::ObjectId;
-use partial_struct::Partial;
 use serde::{Deserialize, Serialize};
-use utoipa::{ToSchema, schema};
+use utoipa::ToSchema;
 use validator::Validate;
 use visible::StructFields;
 
