@@ -44,7 +44,7 @@ export function NavOrganization() {
               />
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="start">
+          <DropdownMenuContent className="w-full" align="start">
             <DropdownMenuLabel className="font-bold">
               Select organization
             </DropdownMenuLabel>
@@ -61,10 +61,10 @@ export function NavOrganization() {
                 </DropdownMenuItem>
               ))}
               <DropdownMenuItem onClick={() => dialogs.show("CreateOrg")}>
-                <div className="p-2 flex justify-center items-center w-full gap-4">
-                  <IconPlus className="[&_svg:not([class*='size-'])]:size-4 text-white" />
+                <div className="rounded-md cursor-pointer flex justify-start items-center gap-2">
+                  <IconPlus className="[&_svg:not([class*='size-'])]:size-2 text-white" />
                   <div className="text-md font-bold">
-                    Create an organization
+                    Create new organization
                   </div>
                 </div>
               </DropdownMenuItem>
