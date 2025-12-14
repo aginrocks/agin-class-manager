@@ -36,13 +36,6 @@ pub async fn init_sea_orm(settings: &Settings) -> Result<sea_orm::DatabaseConnec
     Ok(db)
 }
 
-// pub async fn init_database(settings: &Settings) -> Result<Database> {
-//     let client = Client::with_uri_str(&settings.db.connection_string).await?;
-//     let database = client.database(&settings.db.database_name);
-
-//     Ok(database)
-// }
-
 pub async fn init_redis(settings: &Settings) -> Result<Pool> {
     let config = Config::from_url(&settings.redis.connection_string)?;
     let pool = Pool::new(config, None, None, None, 6)?;

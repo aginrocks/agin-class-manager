@@ -46,13 +46,6 @@ pub struct General {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Db {
-    pub connection_string: String,
-
-    pub database_name: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
 pub struct SeaOrm {
     pub connection_string: String,
 }
@@ -72,7 +65,6 @@ pub struct Redis {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Settings {
     pub general: General,
-    // pub db: Db,
     pub oidc: Oidc,
     pub redis: Redis,
     pub sea_orm: SeaOrm,
@@ -142,10 +134,6 @@ impl Settings {
                     .parse()
                     .expect("hardcoded uri should parse"),
             },
-            // db: Db {
-            //     connection_string: "mongodb://mongodb:27017".to_string(),
-            //     database_name: "agin-class-manager".to_string(),
-            // },
             oidc: Oidc {
                 issuer: IssuerUrl::new("https://example.com".to_string()).unwrap(),
                 client_id: ClientId::new("client_id".to_string()),

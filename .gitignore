@@ -1,8 +1,6 @@
 # Ignore everything inside data/...
-data/mongodb/*
 data/valkey/*
 
-!data/mongodb/dummyfile
 !data/valkey/dummyfile
 
 target

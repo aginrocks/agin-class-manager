@@ -1,14 +1,10 @@
 mod axum_error;
-pub mod database;
 mod init;
 mod middlewares;
 pub mod models;
-mod mongo_id;
 mod routes;
 mod settings;
 mod state;
-// mod store;
-mod utils;
 pub mod validators;
 
 use std::sync::Arc;
@@ -38,14 +34,11 @@ async fn main() -> Result<()> {
 
     let settings = Arc::new(Settings::try_load()?);
 
-    // let database = init_database(&settings).await?;
-
     let fred = init_redis(&settings).await?;
 
     let sea_orm = init_sea_orm(&settings).await?;
 
     let app_state = AppState {
-        // database,
         settings: settings.clone(),
         fred: fred.clone(),
         sea_orm,
