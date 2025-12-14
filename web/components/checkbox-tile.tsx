@@ -14,7 +14,7 @@ export default function CheckboxTile({
   checked,
 }: TileProps) {
   return (
-    <div className="flex w-full max-w-full p-3 gap-2 border-1 border-sidebar-border rounded items-center">
+    <div className="flex w-full max-w-full p-3 gap-2 border-1 border-sidebar-border rounded-lg items-center">
       <Checkbox checked={checked} onCheckedChange={onCheckedChange} />
       <div>{name}</div>
     </div>

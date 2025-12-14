@@ -8,8 +8,11 @@ import { useQuery } from "@tanstack/react-query";
 import { $api } from "@/lib/providers/api";
 import { useMemo } from "react";
 import { IconCoins, IconMicrowave } from "@tabler/icons-react";
+import { useDialogs } from "@/lib/dialogs";
 
 export default function Page() {
+  const dialogs = useDialogs();
+
   const org = useAtomValue(SelectedOrgAtom);
   const { data: user } = useQuery($api.queryOptions("get", "/api/user"));
 
@@ -65,6 +68,7 @@ export default function Page() {
     {
       label: "Create new fundraising",
       icon: IconCoins,
+      onClick: () => dialogs.show("CreateFundraising"),
     },
   ];
 

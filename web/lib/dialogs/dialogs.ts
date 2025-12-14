@@ -3,6 +3,8 @@ import { DialogComponents, DialogDefinition } from "./types";
 import ConfirmDialog from "@/components/dialogs/Confirm";
 import CreateSantaDialog from "@/components/dialogs/CreateSanta";
 import AddMemberDialog from "@/components/dialogs/AddMember";
+import CreateFundraising from "@/components/dialogs/CreateFundraising";
+import ChangeAmount from "@/components/dialogs/ChangeAmount";
 
 export type Dialogs = {
   CreateOrg: DialogDefinition<{
@@ -29,6 +31,16 @@ export type Dialogs = {
     };
     returnValue: undefined;
   }>;
+  CreateFundraising: DialogDefinition<{
+    payload: undefined;
+    returnValue: undefined;
+  }>;
+  ChangeAmount: DialogDefinition<{
+    payload: {
+      amount: number;
+    };
+    returnValue: number;
+  }>;
 };
 
 export const dialogBindings: DialogComponents = {
@@ -36,4 +48,6 @@ export const dialogBindings: DialogComponents = {
   Confirm: ConfirmDialog,
   CreateSanta: CreateSantaDialog,
   AddMember: AddMemberDialog,
+  CreateFundraising: CreateFundraising,
+  ChangeAmount: ChangeAmount,
 };

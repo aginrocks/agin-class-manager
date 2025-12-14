@@ -123,7 +123,7 @@ export default function CreateSantaDialog({
         </div>
         <div className="flex flex-col gap-2 w-[300px]">
           <Label>Participants:</Label>
-          <div className="max-h-[300px] flex-1 overflow-y-auto border-border border rounded p-2 bg-card flex flex-col gap-2">
+          <div className="max-h-[300px] flex-1 overflow-y-auto border-border border rounded-lg p-2 bg-card flex flex-col gap-2">
             {org?.members && org.members.length > 0 ? (
               org.members
                 .filter(

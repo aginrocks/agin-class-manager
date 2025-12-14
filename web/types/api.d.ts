@@ -172,8 +172,8 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /** @example {
-         *       "success": true,
-         *       "id": "60c72b2f9b1d8c001c8e4f5a"
+         *       "id": "60c72b2f9b1d8c001c8e4f5a",
+         *       "success": true
          *     } */
         CreateSuccess: {
             /** Format: int64 */
@@ -189,7 +189,7 @@ export interface components {
             name: string;
             /** Format: int64 */
             organization_id: number;
-            payers: components["schemas"]["Payer"][];
+            payers: components["schemas"]["PayerRes"][];
             /** Format: date-time */
             start_date?: string | null;
             /** Format: int64 */
@@ -281,6 +281,24 @@ export interface components {
             role: components["schemas"]["OrganizationRole"];
         };
         Payer: {
+            /**
+             * Format: int64
+             * @description Custom amout that this user has to pay, if empty, then it's automatically divided evenly between users
+             */
+            amount_to_pay?: number | null;
+            comment: string;
+            /**
+             * Format: int64
+             * @description If empty, defaults to zero
+             */
+            paid_amount?: number | null;
+            /** Format: int64 */
+            user_id: number;
+        };
+        PayerRes: {
+            /** Format: int64 */
+            amount_to_pay: number;
+            comment: string;
             /** Format: int64 */
             paid_amount: number;
             /** Format: int64 */
