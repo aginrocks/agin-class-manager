@@ -24,6 +24,9 @@ pub fn routes() -> OpenApiRouter<AppState> {
 #[utoipa::path(
     method(post),
     path = "/",
+    params(
+        ("org_id" = i64, Path, description = "Organization id"),
+    ),
     request_body = MutableFundraising,
     responses(
         (status = OK, description = "Success", body = CreateSuccess),

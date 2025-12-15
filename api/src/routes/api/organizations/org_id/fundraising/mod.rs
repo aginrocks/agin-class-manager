@@ -28,6 +28,9 @@ pub fn routes() -> OpenApiRouter<AppState> {
 #[utoipa::path(
     method(get),
     path = "/",
+    params(
+        ("org_id" = i64, Path, description = "Organization id"),
+    ),
     responses(
         (status = OK, description = "Success", body = Vec<FundraisingRes>, content_type = "application/json"),
         (status = UNAUTHORIZED, description = "Unauthorized", body = UnauthorizedError, content_type = "application/json")

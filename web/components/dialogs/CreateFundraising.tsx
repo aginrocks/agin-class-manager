@@ -8,9 +8,7 @@ import InputWrapper from "../input-wrapper";
 import { Button } from "../ui/button";
 import { SelectedOrgAtom, TOrgUSer } from "@/lib/atoms/org";
 import { useAtomValue } from "jotai";
-import { useQueryClient } from "@tanstack/react-query";
 import { DatePicker } from "../date-picker";
-import CheckboxTile from "../checkbox-tile";
 import { components } from "@/types/api";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
@@ -23,7 +21,6 @@ export default function CreateFundraising({
 }: ComponentProps<typeof DialogPrimitive.Root> &
   DialogProps<"CreateFundraising">) {
   const dialogs = useDialogs();
-  const queryClient = useQueryClient();
 
   const org = useAtomValue(SelectedOrgAtom) as {
     avatar_url?: string | null;
@@ -40,7 +37,22 @@ export default function CreateFundraising({
     "/api/organizations/{org_id}/fundraising",
   );
 
-  const [values, setValues] = useState<{ [key: number]: number }>({});
+  const [values, setValues] = useState<{ [key: number]: number | undefined }>(
+    {},
+  );
+
+  useEffect(() => {
+    if (!org?.members) {
+      return;
+    }
+
+    setValues(
+      org.members.reduce(
+        (acc, m) => ({ ...acc, [m.id]: undefined }),
+        {} as { [key: number]: number | undefined },
+      ),
+    );
+  }, [org?.members]);
 
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
@@ -54,8 +66,33 @@ export default function CreateFundraising({
     [startDate, endDate, name, description],
   );
 
-  function handleCreate() {
-    if (!isFormValid) return;
+  async function handleCreate() {
+    if (!startDate || !endDate || !name || !description) return;
+
+    await fundraisingsMut.mutateAsync({
+      params: {
+        path: {
+          org_id: org.id,
+        },
+      },
+      body: {
+        start_date: startDate.toISOString(),
+        payers: Object.keys(values).map((val) => {
+          const key = parseInt(val);
+
+          return {
+            comment: "",
+            user_id: key,
+            amount_to_pay: values[key],
+            paid_amount: 0,
+          };
+        }),
+        end_date: endDate.toISOString(),
+        description,
+        name,
+        total_amount: parseInt(amount),
+      },
+    });
   }
 
   return (

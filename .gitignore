@@ -1,7 +1,5 @@
 # Ignore everything inside data/...
-data/valkey/*
-
-!data/valkey/dummyfile
+data
 
 target
 

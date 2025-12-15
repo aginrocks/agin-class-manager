@@ -14,11 +14,16 @@ export default function Layout({
 }>) {
   const router = useRouter();
 
-  const { data: user, isLoading } = useQuery(
-    $api.queryOptions("get", "/api/user"),
-  );
+  const {
+    data: user,
+    isLoading,
+    status,
+  } = useQuery($api.queryOptions("get", "/api/user"));
 
   useEffect(() => {
+    if (!isLoading && status == "error") {
+      router.push("/login");
+    }
     if (!user || isLoading) {
       return;
     }
@@ -26,7 +31,7 @@ export default function Layout({
     if (user?.organizations.length == 0) {
       router.push("/no_org");
     }
-  }, [user?.organizations]);
+  }, [user?.organizations, status, isLoading]);
 
   return isLoading || user?.organizations.length == 0 ? (
     <div className="w-full h-full justify-center items-center flex flex-col gap-2">
