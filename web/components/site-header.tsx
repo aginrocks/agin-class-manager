@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Icon } from "@tabler/icons-react";
 
 export interface HeaderButtonProps extends React.ComponentProps<typeof Button> {
-  label: String;
+  label: string;
   icon?: Icon;
 }
 
