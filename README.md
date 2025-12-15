@@ -21,9 +21,6 @@ In other words this is an app for class treasurers to make their life easier or 
 - creating an organization
 - secret santa management
 - organization settings
-
-### **Somewhat working** _(this functions work but only over bare api)_:
-
 - creating a fundraising
 - adding a member to an organization
 
@@ -56,7 +53,7 @@ _If you want to use something different than traefik, you need to adjust compose
 
 ### Run:
 
-#### You first need to edit config.toml file in repo's root folder, this file is mounted inside docker container.
+#### You first need to create `config.toml` file in repo's root folder, this file will be mounted inside the docker container. You can use `config-template.toml` file as a template.
 
 You need to set oidc client and your public url for oidc to work properly.
 
