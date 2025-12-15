@@ -31,6 +31,9 @@ pub fn routes() -> OpenApiRouter<AppState> {
 #[utoipa::path(
     method(post),
     path = "/",
+    params(
+        ("org_id" = i64, Path, description = "Organization id"),
+    ),
     request_body = MutableSanta,
     responses(
         (status = OK, description = "Success", body = CreateSuccess),
@@ -98,6 +101,9 @@ async fn create_secret_santa(
 #[utoipa::path(
     method(get),
     path = "/",
+    params(
+        ("org_id" = i64, Path, description = "Organization id"),
+    ),
     responses(
         (status = OK, description = "Success", body = PopulatedSanta, content_type = "application/json"),
         (status = UNAUTHORIZED, description = "Unauthorized", body = UnauthorizedError, content_type = "application/json")

@@ -15,11 +15,13 @@ import { Textarea } from "../ui/textarea";
 import ButtonTile from "../button-tile";
 import { Checkbox } from "../ui/checkbox";
 import { useDialogs } from "@/lib/dialogs";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function CreateFundraising({
   ...props
 }: ComponentProps<typeof DialogPrimitive.Root> &
   DialogProps<"CreateFundraising">) {
+  const queryClient = useQueryClient();
   const dialogs = useDialogs();
 
   const org = useAtomValue(SelectedOrgAtom) as {
@@ -69,30 +71,50 @@ export default function CreateFundraising({
   async function handleCreate() {
     if (!startDate || !endDate || !name || !description) return;
 
-    await fundraisingsMut.mutateAsync({
-      params: {
-        path: {
-          org_id: org.id,
+    try {
+      await fundraisingsMut.mutateAsync({
+        params: {
+          path: {
+            org_id: org.id,
+          },
         },
-      },
-      body: {
-        start_date: startDate.toISOString(),
-        payers: Object.keys(values).map((val) => {
-          const key = parseInt(val);
+        body: {
+          start_date: startDate.toISOString(),
+          payers: Object.keys(values).map((val) => {
+            const key = parseInt(val);
 
-          return {
-            comment: "",
-            user_id: key,
-            amount_to_pay: values[key],
-            paid_amount: 0,
-          };
-        }),
-        end_date: endDate.toISOString(),
-        description,
-        name,
-        total_amount: parseInt(amount),
-      },
-    });
+            return {
+              comment: "",
+              user_id: key,
+              amount_to_pay: values[key],
+              paid_amount: 0,
+            };
+          }),
+          end_date: endDate.toISOString(),
+          description,
+          name,
+          total_amount: parseInt(amount),
+        },
+      });
+      await queryClient.invalidateQueries({
+        queryKey: $api.queryOptions(
+          "get",
+          "/api/organizations/{org_id}/fundraising",
+          {
+            params: {
+              path: {
+                org_id: org.id,
+              },
+            },
+          },
+        ).queryKey,
+        refetchType: "active",
+      });
+
+      dialogs.hide("CreateFundraising");
+    } catch (error) {
+      alert(`Failed to create santa event: ${error}`);
+    }
   }
 
   return (

@@ -662,7 +662,10 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                /** @description Organization id */
+                org_id: number;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -691,7 +694,10 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                /** @description Organization id */
+                org_id: number;
+            };
             cookie?: never;
         };
         requestBody: {

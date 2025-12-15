@@ -74,7 +74,6 @@ export default function CreateSantaDialog({
     try {
       await santamut.mutateAsync({
         params: {
-          //@ts-expect-error undefined type for some reason
           path: {
             org_id: org.id,
           },
@@ -87,8 +86,19 @@ export default function CreateSantaDialog({
         },
       });
 
-      queryClient.invalidateQueries({
-        queryKey: ["/api/organizations/{org_id}/santa"],
+      await queryClient.invalidateQueries({
+        queryKey: $api.queryOptions(
+          "get",
+          "/api/organizations/{org_id}/santa",
+          {
+            params: {
+              path: {
+                org_id: org.id,
+              },
+            },
+          },
+        ).queryKey,
+        refetchType: "active",
       });
 
       props.onOpenChange?.(false);
